@@ -4,13 +4,15 @@
 
 class Player : public DynamicEntity
 {
-protected:
+private:
 	sf::Texture texture;
 	void setTexture();
 public:
-	Player(int x, int y, int s);
-	int getX() { return posX; }
-	int getY() { return posY; }
-	void movement();
+	Player(int _x, int _y, int _s);
+	bool left  = false;
+	bool up    = false;
+	bool right = false;
+	bool down  = false;
+	void movement() override;
 };
 
