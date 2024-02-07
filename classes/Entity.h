@@ -4,7 +4,12 @@
 class Entity
 {
 protected:
-	int posX;
-	int posY;
+	int x;
+	int y;
+public:
+	void setX(int _x);
+	void setY(int _y);
+	int getX();
+	int getY();
 };
 

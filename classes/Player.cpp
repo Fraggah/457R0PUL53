@@ -1,11 +1,12 @@
 #include "Player.h"
 
-Player::Player(int x, int y, int s) 
+Player::Player(int _x, int _y, int _s) 
 {
-	posX = x;
-	posY = y;
-	speed = s;
+	x = _x;
+	y = _y;
+	speed = _s;
 	setTexture();
+	sprite.scale(3, 3);
 }
 
 void Player::setTexture()
@@ -18,5 +19,21 @@ void Player::setTexture()
 
 void Player::movement()
 {
-	sprite.setPosition(posX, posY);
+	if (up)
+	{
+		y -= speed;
+	}
+	else if (down)
+	{
+		y += speed;
+	}
+	else if (left)
+	{
+		x -= speed;
+	}
+	else if (right)
+	{
+		x += speed;
+	}
+	sprite.setPosition(x, y);
 }
