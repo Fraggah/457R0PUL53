@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(int _x, int _y, int _s) 
+Player::Player(float _x, float _y, float _s) 
 {
 	x = _x;
 	y = _y;
@@ -23,15 +23,15 @@ void Player::movement()
 	{
 		y -= speed;
 	}
-	else if (down)
+	if (down)
 	{
 		y += speed;
 	}
-	else if (left)
+	if (left)
 	{
 		x -= speed;
 	}
-	else if (right)
+	if (right)
 	{
 		x += speed;
 	}

@@ -4,12 +4,14 @@
 class Entity
 {
 protected:
-	int x;
-	int y;
+	float x;
+	float y;
 public:
-	void setX(int _x);
-	void setY(int _y);
-	int getX();
-	int getY();
+	std::string tag = "default";
+	bool is_active = true;
+	void setX(float _x);
+	void setY(float _y);
+	float getX();
+	float getY();
 };
 

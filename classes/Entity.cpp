@@ -1,21 +1,21 @@
 #include "Entity.h"
 
-void Entity::setX(int _x)
+void Entity::setX(float _x)
 {
     x = _x;
 }
 
-void Entity::setY(int _y)
+void Entity::setY(float _y)
 {
     y = _y;
 }
 
-int Entity::getX()
+float Entity::getX()
 {
     return x;
 }
 
-int Entity::getY()
+float Entity::getY()
 {
     return y;
 }

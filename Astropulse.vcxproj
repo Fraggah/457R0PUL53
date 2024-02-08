@@ -133,6 +133,7 @@
     <ClCompile Include="classes\Bullet.cpp" />
     <ClCompile Include="classes\Entity.cpp" />
     <ClCompile Include="classes\DynamicEntity.cpp" />
+    <ClCompile Include="classes\Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="classes\Player.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="classes\Bullet.h" />
     <ClInclude Include="classes\Entity.h" />
     <ClInclude Include="classes\DynamicEntity.h" />
+    <ClInclude Include="classes\Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="classes\Player.h" />
   </ItemGroup>
