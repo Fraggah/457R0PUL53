@@ -1,7 +1,16 @@
+D:\Projects\AstroPulse\Astropulse\classes\BLaser.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\BLaser.obj
+D:\Projects\AstroPulse\Astropulse\classes\BTriple.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\BTriple.obj
+D:\Projects\AstroPulse\Astropulse\classes\BSimple.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\BSimple.obj
 D:\Projects\AstroPulse\Astropulse\classes\Bullet.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\Bullet.obj
 D:\Projects\AstroPulse\Astropulse\classes\Entity.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\Entity.obj
 D:\Projects\AstroPulse\Astropulse\classes\DynamicEntity.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\DynamicEntity.obj
 D:\Projects\AstroPulse\Astropulse\classes\Enemy.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\Enemy.obj
+D:\Projects\AstroPulse\Astropulse\classes\ECannon.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\ECannon.obj
+D:\Projects\AstroPulse\Astropulse\classes\EDoubleCannon.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\EDoubleCannon.obj
+D:\Projects\AstroPulse\Astropulse\classes\EAssault.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\EAssault.obj
+D:\Projects\AstroPulse\Astropulse\classes\EBomber.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\EBomber.obj
+D:\Projects\AstroPulse\Astropulse\classes\EPowerUp.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\EPowerUp.obj
 D:\Projects\AstroPulse\Astropulse\Game.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\Game.obj
 D:\Projects\AstroPulse\Astropulse\main.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\main.obj
 D:\Projects\AstroPulse\Astropulse\classes\Player.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\Player.obj
+D:\Projects\AstroPulse\Astropulse\classes\PowerUp.cpp;D:\Projects\AstroPulse\Astropulse\x64\Debug\PowerUp.obj

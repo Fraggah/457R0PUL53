@@ -3,6 +3,7 @@
 #include "classes/Player.h"
 #include "classes/Bullet.h"
 #include "classes/Enemy.h"
+#include "classes/EDoubleCannon.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -12,10 +13,10 @@
 class Game
 {
 	sf::RenderWindow m_window;
-	Player* player = new Player(100, 100, 4);
+	Player* player = new Player(500, 900, 6);
 	bool m_running = true;
 	std::map < std::string, std::vector<DynamicEntity*>> entityMap;
-	std::vector<DynamicEntity*> dentities;
+	std::vector<DynamicEntity*> aliveEntities;
 	std::vector<DynamicEntity*> toAdd;
 	int frameCount = 0;
 	int lastFrameSpawn = 0;
@@ -29,6 +30,7 @@ class Game
 
 	void shoot();
 	void enemySpawn();
+	void enemyShoot();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);
