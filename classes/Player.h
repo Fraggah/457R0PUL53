@@ -8,7 +8,7 @@ private:
 	sf::Texture texture;
 	void setTexture();
 public:
-	Player(int _x, int _y, int _s);
+	Player(float _x, float _y, float _s);
 	bool left  = false;
 	bool up    = false;
 	bool right = false;

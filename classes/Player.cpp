@@ -1,12 +1,14 @@
 #include "Player.h"
 
-Player::Player(int _x, int _y, int _s) 
+Player::Player(float _x, float _y, float _s) 
 {
 	x = _x;
 	y = _y;
 	speed = _s;
 	setTexture();
-	sprite.scale(3, 3);
+	sprite.scale(2, 2);
+	boundingBox.setRadius(20);
+	boundingBox.setOrigin(boundingBox.getRadius(), boundingBox.getRadius());
 }
 
 void Player::setTexture()
@@ -23,17 +25,18 @@ void Player::movement()
 	{
 		y -= speed;
 	}
-	else if (down)
+	if (down)
 	{
 		y += speed;
 	}
-	else if (left)
+	if (left)
 	{
 		x -= speed;
 	}
-	else if (right)
+	if (right)
 	{
 		x += speed;
 	}
 	sprite.setPosition(x, y);
+	boundingBox.setPosition(x+boundingBox.getRadius() +12, y + boundingBox.getRadius() +12);
 }

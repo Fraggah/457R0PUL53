@@ -130,19 +130,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="classes\BLaser.cpp" />
+    <ClCompile Include="classes\BTriple.cpp" />
+    <ClCompile Include="classes\BSimple.cpp" />
     <ClCompile Include="classes\Bullet.cpp" />
     <ClCompile Include="classes\Entity.cpp" />
     <ClCompile Include="classes\DynamicEntity.cpp" />
+    <ClCompile Include="classes\Enemy.cpp" />
+    <ClCompile Include="classes\ECannon.cpp" />
+    <ClCompile Include="classes\EDoubleCannon.cpp" />
+    <ClCompile Include="classes\EAssault.cpp" />
+    <ClCompile Include="classes\EBomber.cpp" />
+    <ClCompile Include="classes\EPowerUp.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="classes\Player.cpp" />
+    <ClCompile Include="classes\PowerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="classes\BLaser.h" />
+    <ClInclude Include="classes\BTriple.h" />
+    <ClInclude Include="classes\BSimple.h" />
     <ClInclude Include="classes\Bullet.h" />
     <ClInclude Include="classes\Entity.h" />
     <ClInclude Include="classes\DynamicEntity.h" />
+    <ClInclude Include="classes\Enemy.h" />
+    <ClInclude Include="classes\ECannon.h" />
+    <ClInclude Include="classes\EDoubleCannon.h" />
+    <ClInclude Include="classes\EAssault.h" />
+    <ClInclude Include="classes\EBomber.h" />
+    <ClInclude Include="classes\EPowerUp.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="classes\Player.h" />
+    <ClInclude Include="classes\PowerUp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
