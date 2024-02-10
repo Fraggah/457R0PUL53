@@ -7,7 +7,7 @@ Player::Player(float _x, float _y, float _s)
 	speed = _s;
 	setTexture();
 	sprite.scale(2, 2);
-	boundingBox.setRadius(20);
+	boundingBox.setRadius(24);
 	boundingBox.setOrigin(boundingBox.getRadius(), boundingBox.getRadius());
 }
 
@@ -38,5 +38,5 @@ void Player::movement()
 		x += speed;
 	}
 	sprite.setPosition(x, y);
-	boundingBox.setPosition(x+boundingBox.getRadius() +12, y + boundingBox.getRadius() +12);
+	boundingBox.setPosition(x+boundingBox.getRadius() + 7, y + boundingBox.getRadius() +12);
 }

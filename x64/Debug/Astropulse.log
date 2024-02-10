@@ -1,3 +1,5 @@
 ﻿  Game.cpp
-D:\Projects\AstroPulse\Astropulse\classes\Bullet.h(7,23): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+D:\Projects\AstroPulse\Astropulse\classes\BSimple.h(6,23): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+D:\Projects\AstroPulse\Astropulse\Game.cpp(181,14): warning C4244: 'inicializando': conversión de 'int' a 'float'; posible pérdida de datos
+D:\Projects\AstroPulse\Astropulse\Game.cpp(252,59): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
   Astropulse.vcxproj -> D:\Projects\AstroPulse\Astropulse\x64\Debug\Astropulse.exe

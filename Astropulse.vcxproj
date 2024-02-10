@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="classes\BEnemy.cpp" />
     <ClCompile Include="classes\BLaser.cpp" />
     <ClCompile Include="classes\BTriple.cpp" />
     <ClCompile Include="classes\BSimple.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="classes\PowerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="classes\BEnemy.h" />
     <ClInclude Include="classes\BLaser.h" />
     <ClInclude Include="classes\BTriple.h" />
     <ClInclude Include="classes\BSimple.h" />

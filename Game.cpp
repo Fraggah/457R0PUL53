@@ -16,12 +16,20 @@ void Game::init()
 void Game::sRender() 
 {
 	m_window.clear();
-	m_window.draw(player->sprite);
-	for (size_t i = 0; i < aliveEntities.size(); ++i) {
-		m_window.draw(aliveEntities[i]->sprite);
-		m_window.draw(aliveEntities[i]->boundingBox);
+	if (texturize)
+	{
+		m_window.draw(player->sprite);
+		for (size_t i = 0; i < aliveEntities.size(); ++i) {
+			m_window.draw(aliveEntities[i]->sprite);
+		}
 	}
-	m_window.draw(player->boundingBox);
+	if (debug)
+	{
+		for (size_t i = 0; i < aliveEntities.size(); ++i) {
+			m_window.draw(aliveEntities[i]->boundingBox);
+		}
+		m_window.draw(player->boundingBox);
+	}
 	m_window.display();
 }
 
@@ -48,7 +56,17 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::D) { player->right = true; }
 				else if (event.key.code == sf::Keyboard::W) { player->up    = true; }
 				else if (event.key.code == sf::Keyboard::S) { player->down  = true; }
-				else if (event.key.code == sf::Keyboard::K) {		 shoot();		}
+				else if (event.key.code == sf::Keyboard::K) { shootBSimple(); }
+				else if (event.key.code == sf::Keyboard::L) { shootBLaser(); }
+				else if (event.key.code == sf::Keyboard::T) { shootBTriple(); }
+				else if (event.key.code == sf::Keyboard::F1)
+				{
+					texturize ? texturize = false : texturize = true;
+				}
+				else if (event.key.code == sf::Keyboard::F2)
+				{
+					debug ? debug = false : debug = true;
+				}
 
 				break;
 			}
@@ -88,6 +106,24 @@ void Game::sCollisions()
 		}
 	}
 
+	for (auto enemy : getEntities("enemybullet"))
+	{
+		sf::Vector2f diff(player->boundingBox.getPosition().x - enemy->boundingBox.getPosition().x,
+			player->boundingBox.getPosition().y - enemy->boundingBox.getPosition().y);
+
+		double collisionRadiusSQ = (player->boundingBox.getRadius() + enemy->boundingBox.getRadius()) *
+			(player->boundingBox.getRadius() + enemy->boundingBox.getRadius());
+
+		double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+		if (distSQ < collisionRadiusSQ)
+		{
+			enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
+			player->setX(500); player->setY(900);
+			//resto vida, animacion de explosion y set spawn inbulnerable time
+		}
+	}
+
 	for (auto bullet : getEntities("bullet"))
 	{
 		for (auto enemy : getEntities("enemy"))
@@ -116,23 +152,39 @@ void Game::run()
 	while (m_running)
 	{
 		sUserInput();
-		player->movement();
-		for (size_t i = 0; i < aliveEntities.size(); ++i) {
-			aliveEntities[i]->movement();
-		}
-		enemySpawn();
+		sMovement();
 		sCollisions();
 		sRender();
+		enemySpawn();
 		enemyShoot();
 		update();
 		frameCount++;
 	}
 }
 
-void Game::shoot()
+void Game::shootBSimple()
 {
-	Bullet* bullet = new Bullet(player->getX() + 28 , player->getY(), 2);
+	Bullet* bullet = new BSimple(player->boundingBox.getPosition().x, player->boundingBox.getPosition().y - 32, 2);
 	toAdd.push_back(bullet);
+}
+
+void Game::shootBLaser()
+{
+	Bullet* bulletL = new BLaser(player->boundingBox.getPosition().x - 16, player->boundingBox.getPosition().y, 18);
+	Bullet* bulletR = new BLaser(player->boundingBox.getPosition().x + 16, player->boundingBox.getPosition().y, 18);
+	toAdd.push_back(bulletR);
+	toAdd.push_back(bulletL);
+}
+
+void Game::shootBTriple()
+{
+	float angle = rand() % 5;
+	Bullet* bulletC = new BTriple(player->boundingBox.getPosition().x, player->boundingBox.getPosition().y - 32,0, 20);
+	Bullet* bulletL = new BTriple(player->boundingBox.getPosition().x, player->boundingBox.getPosition().y - 32, -angle, 20);
+	Bullet* bulletR = new BTriple(player->boundingBox.getPosition().x, player->boundingBox.getPosition().y - 32, angle, 20);
+	toAdd.push_back(bulletC);
+	toAdd.push_back(bulletL);
+	toAdd.push_back(bulletR);
 }
 
 void Game::enemySpawn()
@@ -197,10 +249,19 @@ void Game::enemyShoot() //WORKS
 {
 	for (auto& enemy : getEntities("enemy"))
 	{
-		if (enemy->clock.getElapsedTime() > sf::seconds(3))
+		if (enemy->clock.getElapsedTime() > sf::seconds(rand()%3+1))
 		{
-			//Bullet* bullet = new Bullet(enemy->getX() + 14, enemy->getY(), -2);
-			//toAdd.push_back(bullet);
+			Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() +48, 12);
+			toAdd.push_back(bullet);
+			enemy->clock.restart();
 		}
+	}
+}
+
+void Game::sMovement()
+{
+	player->movement();
+	for (size_t i = 0; i < aliveEntities.size(); ++i) {
+		aliveEntities[i]->movement();
 	}
 }
