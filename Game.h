@@ -4,6 +4,10 @@
 #include "classes/Bullet.h"
 #include "classes/Enemy.h"
 #include "classes/EDoubleCannon.h"
+#include "classes/BSimple.h"
+#include "classes/Blaser.h"
+#include "classes/BTriple.h"
+#include "classes/BEnemy.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -21,14 +25,18 @@ class Game
 	int frameCount = 0;
 	int lastFrameSpawn = 0;
 	sf::Clock clock;
+	bool debug = false;
+	bool texturize = true;
 
 	void init();
 	void sRender();
 	void sUserInput();
 	void sCollisions();
-	
+	void sMovement();
 
-	void shoot();
+	void shootBSimple();
+	void shootBLaser();
+	void shootBTriple();
 	void enemySpawn();
 	void enemyShoot();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);
