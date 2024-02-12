@@ -12,7 +12,6 @@ class EDoubleCannon : public Enemy
         {100, 300},
         {900, 300},
         {1200, 400},
-
     };
     void setTexture();
 public:

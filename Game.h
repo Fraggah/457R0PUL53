@@ -4,10 +4,12 @@
 #include "classes/Bullet.h"
 #include "classes/Enemy.h"
 #include "classes/EDoubleCannon.h"
+#include "classes/EAssault.h"
 #include "classes/BSimple.h"
 #include "classes/Blaser.h"
 #include "classes/BTriple.h"
 #include "classes/BEnemy.h"
+#include "classes/EntityBoom.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -38,7 +40,9 @@ class Game
 	void shootBLaser();
 	void shootBTriple();
 	void enemySpawn();
+	void spawnAssault();
 	void enemyShoot();
+	void boomSpamTime();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);

@@ -59,6 +59,7 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::K) { shootBSimple(); }
 				else if (event.key.code == sf::Keyboard::L) { shootBLaser(); }
 				else if (event.key.code == sf::Keyboard::T) { shootBTriple(); }
+				else if (event.key.code == sf::Keyboard::Num1) { spawnAssault(); }
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					texturize ? texturize = false : texturize = true;
@@ -102,25 +103,27 @@ void Game::sCollisions()
 		{
 			enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
 			player->setX(500); player->setY(900);
-			//resto vida, animacion de explosion y set spawn inbulnerable time
+			//inb time
 		}
 	}
 
-	for (auto enemy : getEntities("enemybullet"))
+	for (auto enemyb : getEntities("enemybullet"))
 	{
-		sf::Vector2f diff(player->boundingBox.getPosition().x - enemy->boundingBox.getPosition().x,
-			player->boundingBox.getPosition().y - enemy->boundingBox.getPosition().y);
+		sf::Vector2f diff(player->boundingBox.getPosition().x - enemyb->boundingBox.getPosition().x,
+			player->boundingBox.getPosition().y - enemyb->boundingBox.getPosition().y);
 
-		double collisionRadiusSQ = (player->boundingBox.getRadius() + enemy->boundingBox.getRadius()) *
-			(player->boundingBox.getRadius() + enemy->boundingBox.getRadius());
+		double collisionRadiusSQ = (player->boundingBox.getRadius() + enemyb->boundingBox.getRadius()) *
+			(player->boundingBox.getRadius() + enemyb->boundingBox.getRadius());
 
 		double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
 
 		if (distSQ < collisionRadiusSQ)
 		{
-			enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
+			enemyb->is_active = false; 
+			DynamicEntity* boom = new EntityBoom(player->getX(), player->getY(), true);
+			toAdd.push_back(boom);
 			player->setX(500); player->setY(900);
-			//resto vida, animacion de explosion y set spawn inbulnerable time
+			//inb time
 		}
 	}
 
@@ -140,6 +143,8 @@ void Game::sCollisions()
 			{
 				enemy->is_active = false;
 				bullet->is_active = false;
+				DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
+				toAdd.push_back(boom);
 				printf("CRASH\n");
 			}		
 		}
@@ -157,6 +162,7 @@ void Game::run()
 		sRender();
 		enemySpawn();
 		enemyShoot();
+		boomSpamTime();
 		update();
 		frameCount++;
 	}
@@ -198,12 +204,31 @@ void Game::enemySpawn()
 	
 }
 
+void Game::spawnAssault()
+{
+	Enemy* enemy = new EAssault(rand() % 1000 + 40, rand() % 5 - 3);
+	toAdd.push_back(enemy);
+
+}
+
 void Game::removeDeadEntities(std::vector<DynamicEntity*>& vec)
 {
 	vec.erase(std::remove_if(vec.begin(), vec.end(),
 		[](Entity* entity) { return !entity->is_active; }),
 		vec.end());
 
+}
+
+void Game::boomSpamTime()
+{
+	for (auto boom : getEntities("explosion"))
+	{
+		if (boom->animationState == 3 )
+		{
+			boom->is_active = false;
+			printf("boom");
+		}
+	}
 }
 
 const std::vector<DynamicEntity*>& Game::getEntities(const std::string& tag)
@@ -249,12 +274,16 @@ void Game::enemyShoot() //WORKS
 {
 	for (auto& enemy : getEntities("enemy"))
 	{
-		if (enemy->clock.getElapsedTime() > sf::seconds(rand()%3+1))
+		if (enemy->type == 1)
 		{
-			Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() +48, 12);
-			toAdd.push_back(bullet);
-			enemy->clock.restart();
+			if (enemy->clock.getElapsedTime() > sf::seconds(rand() % 3 + 1))
+			{
+				Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() + 48, 12);
+				toAdd.push_back(bullet);
+				enemy->clock.restart();
+			}
 		}
+
 	}
 }
 

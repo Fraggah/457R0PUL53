@@ -2,6 +2,7 @@
 
 EDoubleCannon::EDoubleCannon() : currentWaypointIndex(0)
 {
+    type = 1;
     x = -50;
     y = 0;
     speed = 4;
@@ -12,10 +13,12 @@ EDoubleCannon::EDoubleCannon() : currentWaypointIndex(0)
 
 void EDoubleCannon::setTexture()
 {
-    if (!texture.loadFromFile("assets/enemy.png"))
+    if (!texture.loadFromFile("assets/doublecannon.png"))
         printf("cannot load Enemy texture");
 
     sprite.setTexture(texture);
+
+    sprite.setTextureRect(textureRect1);
 }
 
 void EDoubleCannon::movement()
@@ -39,4 +42,16 @@ void EDoubleCannon::movement()
 
     sprite.setPosition(x, y);
     boundingBox.setPosition(x + boundingBox.getRadius(), y + boundingBox.getRadius());
+
+    animationTimer += animationClock.restart().asSeconds(); // Actualizar el temporizador de animación
+
+    if (animationTimer >= animationSwitchTime) {
+        if (sprite.getTextureRect() == textureRect1) {
+            sprite.setTextureRect(textureRect2);
+        }
+        else {
+            sprite.setTextureRect(textureRect1);
+        }
+        animationTimer = 0.0f; // Reiniciar el temporizador
+    }
 }
