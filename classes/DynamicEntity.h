@@ -4,9 +4,9 @@
 class DynamicEntity : public Entity
 {	
 protected:
-	sf::IntRect textureRect1{0, 0, 32, 32};
-	sf::IntRect textureRect2{32, 0, 32, 32};
-	sf::IntRect textureRect3{64, 0, 32, 32};
+	sf::IntRect textureRect1{0, 0, 16, 16};
+	sf::IntRect textureRect2{16, 0, 16, 16};
+	sf::IntRect textureRect3{32, 0, 16, 16};
 public:
 	DynamicEntity();
 	size_t type = 0;

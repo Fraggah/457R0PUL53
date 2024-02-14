@@ -9,7 +9,7 @@ void Game::init()
 {
 	//Iniciacion Final: Utilizar una base de datos en txt que cargue las configuraciones
 
-	m_window.create(sf::VideoMode(1080, 1080), "AstroPulse", sf::Style::Close);
+	m_window.create(sf::VideoMode(WIDTH, HEIGHT), "AstroPulse", sf::Style::Close);
 	m_window.setFramerateLimit(60);
 }
 
@@ -60,6 +60,8 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::L) { shootBLaser(); }
 				else if (event.key.code == sf::Keyboard::T) { shootBTriple(); }
 				else if (event.key.code == sf::Keyboard::Num1) { spawnAssault(); }
+				else if (event.key.code == sf::Keyboard::Num2) { spawnCannon(); }
+				else if (event.key.code == sf::Keyboard::Num3) { enemySpawn(); }
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					texturize ? texturize = false : texturize = true;
@@ -87,7 +89,13 @@ void Game::sUserInput()
 void Game::sCollisions()
 {	
 	//Sistema final: agregar una bounding box circular a las entities y utilizar formula de distancia menos radio
-
+	for (auto enemy : getEntities("enemy"))
+	{
+		if (enemy->getX() > WIDTH + 100 || enemy->getX() < -100 || enemy->getY() > HEIGHT + 100 || enemy->getY() < - 100)
+		{
+			enemy->is_active = false;
+		}
+	}
 
 	for (auto enemy : getEntities("enemy"))
 	{
@@ -211,6 +219,21 @@ void Game::spawnAssault()
 
 }
 
+void Game::spawnCannon()
+{
+	Enemy* enemy = new ECannon(true, cannonIterator);
+	toAdd.push_back(enemy);
+	if (cannonIterator != 4)
+	{
+		cannonIterator++;
+	}
+	else
+	{
+		cannonIterator = 0;
+	}
+
+}
+
 void Game::removeDeadEntities(std::vector<DynamicEntity*>& vec)
 {
 	vec.erase(std::remove_if(vec.begin(), vec.end(),
@@ -274,16 +297,35 @@ void Game::enemyShoot() //WORKS
 {
 	for (auto& enemy : getEntities("enemy"))
 	{
+		int i = 0;
 		if (enemy->type == 1)
 		{
 			if (enemy->clock.getElapsedTime() > sf::seconds(rand() % 3 + 1))
 			{
-				Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() + 48, 12);
+				Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() + 48, 12, 0);
 				toAdd.push_back(bullet);
 				enemy->clock.restart();
 			}
 		}
-
+		if (enemy->type == 2)
+		{
+			sf::Vector2f direction(player->getX() - enemy->getX(), player->getY() - enemy->getY());
+			float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+			if (length != 0)
+			{
+				direction /= length;
+			}
+			if (enemy->speed == 0)
+			{
+				if (enemy->clock.getElapsedTime() > sf::seconds(0.5) && i < 4)
+				{
+					Bullet* bullet = new BEnemy(enemy->getX() + 44, enemy->getY() + 48, direction.y*10, direction.x*10);
+					toAdd.push_back(bullet);
+					enemy->clock.restart();
+					i++;
+				}
+			}
+		}
 	}
 }
 

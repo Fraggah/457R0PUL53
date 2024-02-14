@@ -7,18 +7,18 @@ EntityBoom::EntityBoom(float _x, float _y, bool _isp)
 	y = _y;
     isplayer = _isp;
     setTexture();
-    sprite.scale(2, 2);
+    sprite.scale(4, 4);
 }
 
 void EntityBoom::setTexture()
 {
     if (isplayer)
     {
-        if (!texture.loadFromFile("assets/playerboom.png"))
+        if (!texture.loadFromFile("assets/16/pboom.png"))
             printf("cannot load Enemy texture");
     }
     else {
-        if (!texture.loadFromFile("assets/enemyboom.png"))
+        if (!texture.loadFromFile("assets/16/eboom.png"))
             printf("cannot load Enemy texture");
     }
 

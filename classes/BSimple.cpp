@@ -7,7 +7,7 @@ BSimple::BSimple(float _x, float _y, float _s)
 	speed = _s;
 	tag = "bullet";
 	setTexture();
-	sprite.scale(2, 2);
+	sprite.scale(3, 3);
 	boundingBox.setRadius(3);
 	boundingBox.setOrigin(boundingBox.getRadius(), boundingBox.getRadius());
 }

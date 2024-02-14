@@ -6,14 +6,14 @@ Player::Player(float _x, float _y, float _s)
 	y = _y;
 	speed = _s;
 	setTexture();
-	sprite.scale(2, 2);
+	sprite.scale(4, 4);
 	boundingBox.setRadius(24);
 	boundingBox.setOrigin(boundingBox.getRadius(), boundingBox.getRadius());
 }
 
 void Player::setTexture()
 {
-	if (!texture.loadFromFile("assets/player.png"))
+	if (!texture.loadFromFile("assets/16/player.png"))
 		printf("Player texture cannot load");
 
 	sprite.setTexture(texture);

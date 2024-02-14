@@ -1,10 +1,11 @@
 #include "BEnemy.h"
 
-BEnemy::BEnemy(float _x, float _y, float _s)
+BEnemy::BEnemy(float _x, float _y, float _sy, float _sx)
 {
 	x = _x;
 	y = _y;
-	speed = _s;
+	speed = _sy;
+	speedx = _sx;
 	tag = "enemybullet";
 	setTexture();
 	sprite.scale(2, -2);
@@ -22,6 +23,7 @@ void BEnemy::setTexture()
 
 void BEnemy::movement()
 {
+	x += speedx;
 	y += speed;
 	sprite.setPosition(x - 32, y + 32);
 	boundingBox.setPosition(x, y);

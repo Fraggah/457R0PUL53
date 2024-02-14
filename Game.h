@@ -5,6 +5,7 @@
 #include "classes/Enemy.h"
 #include "classes/EDoubleCannon.h"
 #include "classes/EAssault.h"
+#include "classes/ECannon.h"
 #include "classes/BSimple.h"
 #include "classes/Blaser.h"
 #include "classes/BTriple.h"
@@ -15,6 +16,8 @@
 #include <algorithm>
 #include <type_traits>
 
+#define WIDTH 1024
+#define HEIGHT 1024
 
 class Game
 {
@@ -29,6 +32,7 @@ class Game
 	sf::Clock clock;
 	bool debug = false;
 	bool texturize = true;
+	int cannonIterator = 0;
 
 	void init();
 	void sRender();
@@ -41,6 +45,7 @@ class Game
 	void shootBTriple();
 	void enemySpawn();
 	void spawnAssault();
+	void spawnCannon();
 	void enemyShoot();
 	void boomSpamTime();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);

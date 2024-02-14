@@ -8,12 +8,12 @@ EDoubleCannon::EDoubleCannon() : currentWaypointIndex(0)
     speed = 4;
     tag = "enemy";
     setTexture();
-    sprite.scale(2, 2);
+    sprite.scale(4, 4);
 }
 
 void EDoubleCannon::setTexture()
 {
-    if (!texture.loadFromFile("assets/doublecannon.png"))
+    if (!texture.loadFromFile("assets/16/edoublecannon.png"))
         printf("cannot load Enemy texture");
 
     sprite.setTexture(texture);
