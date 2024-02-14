@@ -143,10 +143,12 @@
     <ClCompile Include="classes\EAssault.cpp" />
     <ClCompile Include="classes\EBomber.cpp" />
     <ClCompile Include="classes\EPowerUp.cpp" />
+    <ClCompile Include="classes\EntityBoom.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="classes\Player.cpp" />
     <ClCompile Include="classes\PowerUp.cpp" />
+    <ClCompile Include="classes\StaticEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes\BEnemy.h" />
@@ -162,9 +164,11 @@
     <ClInclude Include="classes\EAssault.h" />
     <ClInclude Include="classes\EBomber.h" />
     <ClInclude Include="classes\EPowerUp.h" />
+    <ClInclude Include="classes\EntityBoom.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="classes\Player.h" />
     <ClInclude Include="classes\PowerUp.h" />
+    <ClInclude Include="classes\StaticEntity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,7 +7,7 @@ BLaser::BLaser(float _x, float _y, float _s)
 	speed = _s;
 	tag = "bullet";
 	setTexture();
-	sprite.scale(2, 2);
+	sprite.scale(3, 3);
 	boundingBox.setRadius(3);
 	boundingBox.setOrigin(boundingBox.getRadius(), boundingBox.getRadius());
 }
@@ -23,6 +23,6 @@ void BLaser::setTexture()
 void BLaser::movement()
 {
 	y -= speed;
-	sprite.setPosition(x - 32, y - 32);
+	sprite.setPosition(x - 48, y - 48);
 	boundingBox.setPosition(x, y);
 }
