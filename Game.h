@@ -6,6 +6,7 @@
 #include "classes/EDoubleCannon.h"
 #include "classes/EAssault.h"
 #include "classes/ECannon.h"
+#include "classes/EBomber.h"
 #include "classes/BSimple.h"
 #include "classes/Blaser.h"
 #include "classes/BTriple.h"
@@ -17,22 +18,35 @@
 #include <type_traits>
 
 #define WIDTH 1024
-#define HEIGHT 1024
+#define HEIGHT 960
 
 class Game
 {
 	sf::RenderWindow m_window;
-	Player* player = new Player(500, 900, 6);
+	Player* m_player = new Player(500, 900, 6);
 	bool m_running = true;
-	std::map < std::string, std::vector<DynamicEntity*>> entityMap;
-	std::vector<DynamicEntity*> aliveEntities;
-	std::vector<DynamicEntity*> toAdd;
-	int frameCount = 0;
-	int lastFrameSpawn = 0;
+	std::map < std::string, std::vector<DynamicEntity*>> m_entityMap;
+	std::vector<DynamicEntity*> m_aliveEntities;
+	std::vector<DynamicEntity*> m_toAdd;
+	int m_currentFrame = 0;
 	sf::Clock clock;
-	bool debug = false;
-	bool texturize = true;
-	int cannonIterator = 0;
+	bool m_debug = false;
+	bool m_texturize = true;
+	bool m_paused = false;
+
+	int cannonIterator = 0;         //enemy manager
+	bool cannonLR = true;           //enemy manager
+
+
+	sf::Font font;
+	sf::Text frametest;
+	std::string tframe = "F: ";
+	sf::Sprite background;
+	sf::Sprite backgroundmirror;
+	sf::Texture btexture;
+	sf::Sprite background2;
+	sf::Sprite backgroundmirror2;
+	sf::Texture btexture2;
 
 	void init();
 	void sRender();
@@ -43,14 +57,18 @@ class Game
 	void shootBSimple();
 	void shootBLaser();
 	void shootBTriple();
-	void enemySpawn();
+	void spawnDoubleCannon(bool _l);
 	void spawnAssault();
 	void spawnCannon();
+	void spawnBomber(int pos);
 	void enemyShoot();
 	void boomSpamTime();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);
+
+	void interface();
+	void level1();
 
 public:
 	Game();

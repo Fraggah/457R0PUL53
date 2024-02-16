@@ -5,8 +5,9 @@ EAssault::EAssault(int _x, float _sx)
     type = 3;
     x = _x;
     y = -50;
-    speed = 8;
+    speed = 14;
     speedx = _sx;
+    lifes = 1;
     tag = "enemy";
     setTexture();
     sprite.scale(4, 4);

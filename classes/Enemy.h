@@ -3,11 +3,9 @@
 
 class Enemy : public DynamicEntity
 {
+protected:
     size_t currentWaypointIndex;
-    int lifes;
-public:
     Enemy();
-    int getLifes() { return lifes; }
     void movement() override = 0;
 };
 

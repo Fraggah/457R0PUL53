@@ -3,10 +3,19 @@
 ECannon::ECannon(bool _l, int _wp) : currentWaypointIndex(_wp)
 {
     type = 2;
-    x = -50;
-    y = -50;
-    speed = 10;
     lstart = _l;
+    if (lstart)
+    {
+        x = -50;
+        y = -50;
+    }
+    else
+    {
+        x = 1024 + 50;
+        y = -50;
+    }
+    speed = 10;
+    lifes = 1;
     tag = "enemy";
     setTexture();
     sprite.scale(4, 4);

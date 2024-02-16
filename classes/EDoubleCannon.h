@@ -13,9 +13,10 @@ class EDoubleCannon : public Enemy
         {900, 300},
         {1200, 400},
     };
+    bool left;
     void setTexture();
 public:
-    EDoubleCannon();
+    EDoubleCannon(bool _l);
     void movement() override;
 };
 

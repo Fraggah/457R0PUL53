@@ -1,11 +1,40 @@
 #include "EDoubleCannon.h"
 
-EDoubleCannon::EDoubleCannon() : currentWaypointIndex(0)
+EDoubleCannon::EDoubleCannon(bool _l) : currentWaypointIndex(0)
 {
     type = 1;
-    x = -50;
-    y = 0;
-    speed = 4;
+    speed = 5;
+    lifes = 1;
+    left = _l;
+    if (left)
+    {
+        x = -50;
+        y = 0;
+        waypoints = {
+            {100, 100},
+            {900, 100},
+            {900, 200},
+            {100, 200},
+            {100, 300},
+            {900, 300},
+            {1200, 400},
+        };
+    }
+    else
+    {
+        x = 1010;
+        y = 0;
+        waypoints = {
+            {900, 100},
+            {100, 100},
+            {100, 200},
+            {900, 200},
+            {900, 300},
+            {100, 300},
+            {-150, 400},
+        };
+    }
+
     tag = "enemy";
     setTexture();
     sprite.scale(4, 4);
@@ -29,7 +58,7 @@ void EDoubleCannon::movement()
     float distance = sqrt(dx * dx + dy * dy);
 
     // Si el enemigo está lo suficientemente cerca del waypoint actual, pasa al siguiente waypoint
-    if (distance < 1.0) {
+    if (distance < 3.0) {
         currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.size();
         return; // Salir de la función para evitar actualizar la posición del enemigo hasta la próxima iteración
     }
