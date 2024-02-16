@@ -9,13 +9,12 @@ class EBomber : public Enemy
         {500, 100},
         {750, 100},
         {500, -150},
-
     };
     bool reachedFirstWaypoint = false;
     sf::Clock stop;
     void setTexture();
 public:
-    EBomber(int _wp);
+    EBomber(size_t _wp);
     void movement() override;
 };
 

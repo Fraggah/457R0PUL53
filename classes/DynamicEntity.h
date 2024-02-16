@@ -22,5 +22,7 @@ public:
 	float animationTimer = 0.0f;
 	float animationSwitchTime = 0.2f;
 	int animationState = 0;
+	bool PL;
+	bool PR;
 };
 

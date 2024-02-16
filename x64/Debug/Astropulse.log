@@ -1,2 +1,6 @@
 ﻿  EBomber.cpp
+D:\Projects\AstroPulse\Astropulse\classes\EBomber.cpp(41,45): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+D:\Projects\AstroPulse\Astropulse\classes\EBomber.cpp(45,50): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+D:\Projects\AstroPulse\Astropulse\classes\EBomber.cpp(45,94): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+D:\Projects\AstroPulse\Astropulse\classes\EBomber.cpp(49,50): warning C4305: 'argumento': truncamiento de 'double' a 'float'
   Astropulse.vcxproj -> D:\Projects\AstroPulse\Astropulse\x64\Debug\Astropulse.exe
