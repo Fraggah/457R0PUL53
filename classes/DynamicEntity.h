@@ -10,6 +10,7 @@ protected:
 public:
 	DynamicEntity();
 	size_t type = 0;
+	int lifes;
 	sf::CircleShape boundingBox;
 	float speed = 0;
 	float speedx = 0;
