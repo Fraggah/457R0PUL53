@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "classes/Player.h"
+#include "classes/PEnergyShield.h"
 #include "classes/Bullet.h"
 #include "classes/Enemy.h"
 #include "classes/EDoubleCannon.h"
@@ -12,10 +13,13 @@
 #include "classes/BTriple.h"
 #include "classes/BEnemy.h"
 #include "classes/EntityBoom.h"
+#include "classes/PULaser.h"
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <type_traits>
+#include <ctime>
+#include <cstdlib>
 
 #define WIDTH 1024
 #define HEIGHT 960
@@ -33,6 +37,7 @@ class Game
 	bool m_debug = false;
 	bool m_texturize = true;
 	bool m_paused = false;
+	float esOffset = 32;
 
 	int cannonIterator = 0;         //enemy manager
 	bool cannonLR = true;           //enemy manager
@@ -54,6 +59,8 @@ class Game
 	void sCollisions();
 	void sMovement();
 
+	void spawnPowerUp(float _x, float _y);
+	void energyShield();
 	void shootBSimple();
 	void shootBLaser();
 	void shootBTriple();

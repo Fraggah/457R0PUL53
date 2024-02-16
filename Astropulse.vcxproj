@@ -149,6 +149,8 @@
     <ClCompile Include="classes\Player.cpp" />
     <ClCompile Include="classes\PowerUp.cpp" />
     <ClCompile Include="classes\StaticEntity.cpp" />
+    <ClCompile Include="classes\PEnergyShield.cpp" />
+    <ClCompile Include="classes\PULaser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes\BEnemy.h" />
@@ -169,6 +171,8 @@
     <ClInclude Include="classes\Player.h" />
     <ClInclude Include="classes\PowerUp.h" />
     <ClInclude Include="classes\StaticEntity.h" />
+    <ClInclude Include="classes\PEnergyShield.h" />
+    <ClInclude Include="classes\PULaser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

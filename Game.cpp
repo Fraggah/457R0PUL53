@@ -48,10 +48,10 @@ void Game::sRender()
 	m_window.draw(backgroundmirror2);
 	if (m_texturize)
 	{
-		m_window.draw(m_player->sprite);
 		for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
 			m_window.draw(m_aliveEntities[i]->sprite);
 		}
+		m_window.draw(m_player->sprite);
 	}
 	if (m_debug)
 	{
@@ -94,6 +94,8 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::Num2 && !m_paused) { spawnCannon(); }
 				else if (event.key.code == sf::Keyboard::Num3 && !m_paused) { spawnDoubleCannon(true); }
 				else if (event.key.code == sf::Keyboard::Num4 && !m_paused) { spawnBomber(2); }
+				else if (event.key.code == sf::Keyboard::Num6 && !m_paused) { spawnPowerUp(300,300); }
+				else if (event.key.code == sf::Keyboard::J && !m_paused) { energyShield(); }
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					m_texturize ? m_texturize = false : m_texturize = true;
@@ -204,6 +206,11 @@ void Game::sCollisions()
 					enemy->is_active = false;
 					DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
 					m_toAdd.push_back(boom);
+					int RNG = rand() % 100 + 1;
+					if (RNG < 4)
+					{
+						spawnPowerUp(enemy->getX(), enemy->getY());
+					}
 				}
 				else
 				{
@@ -215,6 +222,24 @@ void Game::sCollisions()
 		}
 	}
 
+	for (auto shield : getEntities("shield"))
+	{
+		for (auto ebullet : getEntities("enemybullet"))
+		{	//A causa de que el el movimiento del shield funciona diferente tuve que sumarle un offset para que coinsida con el centro de la BB
+			sf::Vector2f diff(shield->boundingBox.getPosition().x + (esOffset*2)- ebullet->boundingBox.getPosition().x,
+								shield->boundingBox.getPosition().y + (esOffset*2)- ebullet->boundingBox.getPosition().y);
+
+			double collisionRadiusSQ = (shield->boundingBox.getRadius() + ebullet->boundingBox.getRadius()) *
+										(shield->boundingBox.getRadius() + ebullet->boundingBox.getRadius());
+
+			double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+			if (distSQ < collisionRadiusSQ)
+			{
+				ebullet->is_active = false;
+			}
+		}
+	}
 }
 
 void Game::run() 
@@ -429,11 +454,62 @@ void Game::enemyShoot() //WORKS
 	}
 }
 
+void Game::energyShield()
+{
+	DynamicEntity* shield = new PEnergyShield(m_player->speed);
+	m_toAdd.push_back(shield);
+}
+
+void Game::spawnPowerUp(float _x, float _y)
+{
+	int RNG = rand() % 100 + 1;
+	//Enery Shield ---->>>> Cambiar por un contador de enemigos muertos y que caiga cada 15 o 20
+	if (RNG > 30)
+	{
+		DynamicEntity* power = new PULaser(_x, _y,5);
+		m_toAdd.push_back(power);
+	}
+	//Laser
+	else if (RNG > 20 && RNG < 30)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 1);
+		m_toAdd.push_back(power);
+	}
+	//Triple
+	else if (RNG > 10 && RNG < 20)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 2);
+		m_toAdd.push_back(power);
+	}
+	//X Blast
+	else if (RNG > 4 && RNG < 10)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 4);
+		m_toAdd.push_back(power);
+	}
+	//Life Up
+	else if (RNG > 0 && RNG < 4)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 3);
+		m_toAdd.push_back(power);
+	}
+}
+
 void Game::sMovement()
 {
 	m_player->movement();
 	for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
 		m_aliveEntities[i]->movement();
+	}
+
+	for (auto shield : getEntities("shield"))
+	{
+		shield->sprite.setPosition(m_player->getX()-esOffset, m_player->getY()-esOffset);
+		shield->boundingBox.setPosition(m_player->getX()-esOffset, m_player->getY()-esOffset);
+		if (shield->clock.getElapsedTime() > sf::seconds(2))
+		{
+			shield->is_active = false;
+		}
 	}
 
 	if (m_currentFrame < 120)
