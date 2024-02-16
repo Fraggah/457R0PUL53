@@ -160,7 +160,7 @@ void Game::sCollisions()
 
 		if (distSQ < collisionRadiusSQ)
 		{
-			enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
+			//enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
 			m_player->setX(500); m_player->setY(900);
 			//inb time
 		}
@@ -294,11 +294,14 @@ void Game::spawnCannon()
 	else {
 		cannonLR = true;
 	}
+	
+
 }
 
 void Game::spawnBomber(int pos)
 {
-	Enemy* enemy = new EBomber(pos-1);
+	pos--;
+	Enemy* enemy = new EBomber(pos);
 	m_toAdd.push_back(enemy);
 }
 
@@ -377,6 +380,22 @@ void Game::enemyShoot() //WORKS
 		}
 		if (enemy->type == 2)
 		{
+			if (enemy->getX() - 50 > m_player->getX())
+			{
+				enemy->PL = true;
+			}
+			else
+			{
+				enemy->PL = false;
+			}
+			if (enemy->getX() + 50 < m_player->getX())
+			{
+				enemy->PR = true;
+			}
+			else
+			{
+				enemy->PR = false;
+			}
 			sf::Vector2f direction(m_player->getX() - enemy->getX(), m_player->getY() - enemy->getY());
 			float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 			if (length != 0)
@@ -510,6 +529,28 @@ void Game::level1()
 	case 2400:spawnCannon();break;
 	case 2550:spawnBomber(2);break;
 	case 2700:spawnBomber(1);spawnBomber(3);break;
+	case 3000:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3020:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3040:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3060:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3160:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3180:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3200:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3220:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+	case 3300:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3330:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3360:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3390:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3400:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3430:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3460:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3490:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
+	case 3550:spawnBomber(2);
+	case 3600:spawnCannon();break;
+	case 3650:spawnCannon();break;
+	case 3700:spawnCannon();break;
+	case 3750:spawnCannon();break;
+	case 3800:spawnCannon();break;
 	}
 
 }

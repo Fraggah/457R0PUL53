@@ -1,8 +1,9 @@
 #include "EBomber.h"
 
-EBomber::EBomber(int _wp) : currentWaypointIndex(_wp)
+EBomber::EBomber(size_t _wp)
 {
     type = 4;
+    currentWaypointIndex = _wp;
     if (_wp == 0)
     {
         x = 250;
@@ -37,38 +38,23 @@ void EBomber::setTexture()
 
 void EBomber::movement()
 {
-    // Calcula la dirección hacia el waypoint actual
-    float dx = waypoints[currentWaypointIndex].x - x;
-    float dy = waypoints[currentWaypointIndex].y - y;
-    float distance = sqrt(dx * dx + dy * dy);
-
-    // Si el enemigo está lo suficientemente cerca del waypoint actual, pasa al siguiente waypoint
-    if (distance < 5.0) {
-        if (!reachedFirstWaypoint) {
-            // Si es la primera vez que llega al primer waypoint, frena y reinicia el temporizador
-            stop.restart();
-            reachedFirstWaypoint = true;
-            speed = 0;
-            return; // Salir de la función para evitar actualizar la posición del enemigo hasta la próxima iteración
-        }
-        else if (stop.getElapsedTime() >= sf::seconds(2)) {
-            // Si ha pasado un segundo desde que llegó al primer waypoint, restablece la velocidad y pasa al siguiente waypoint
-            speed = 16;
-            currentWaypointIndex = 3;
-            reachedFirstWaypoint = false; // Reiniciar la bandera
-        }
-        return; // Salir de la función para evitar actualizar la posición del enemigo hasta la próxima iteración
+    if (stop.getElapsedTime() < sf::seconds(0.3))
+    {
+        speed = 10;
+    }
+    else if (stop.getElapsedTime() > sf::seconds(0.3) && stop.getElapsedTime() < sf::seconds(2.3))
+    {
+        speed = 0;
+    }
+    else if (stop.getElapsedTime() > sf::seconds(2.3))
+    {
+        speed = -10;
     }
 
-    // Normaliza la dirección y aplica velocidad para mover el enemigo
-    dx /= distance;
-    dy /= distance;
-    x += dx * speed;
-    y += dy * speed;
+    y += speed;
 
     sprite.setPosition(x, y);
     boundingBox.setPosition(x + boundingBox.getRadius(), y + boundingBox.getRadius());
-
 
     if (lifes == 1)
     {
@@ -86,5 +72,4 @@ void EBomber::movement()
         }
         animationTimer = 0.0f; // Reiniciar el temporizador
     }
-
 }

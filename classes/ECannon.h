@@ -11,7 +11,6 @@ class ECannon : public Enemy
         {600, 450},
         {750, 450},
         {1900, 1900},
-
     };
     bool reachedFirstWaypoint = false;
     bool lstart;
