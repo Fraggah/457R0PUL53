@@ -38,6 +38,10 @@ class Game
 	bool m_texturize = true;
 	bool m_paused = false;
 	float esOffset = 32;
+	int enemiesKilled = 0;
+	int energyLevel = 0;
+	bool m_laserOn = false;
+	bool m_tripleOn = false;
 
 	int cannonIterator = 0;         //enemy manager
 	bool cannonLR = true;           //enemy manager
@@ -61,7 +65,7 @@ class Game
 
 	void spawnPowerUp(float _x, float _y);
 	void energyShield();
-	void shootBSimple();
+	void shoot();
 	void shootBLaser();
 	void shootBTriple();
 	void spawnDoubleCannon(bool _l);

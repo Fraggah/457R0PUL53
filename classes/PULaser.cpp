@@ -6,6 +6,7 @@ PULaser::PULaser(float _x, float _y, int _type)
 	y = _y;
 	type = _type;
 	speed = 5;
+	tag = "powerup";
 	setTexture();
 	sprite.scale(4, 4);
 	boundingBox.setRadius(20);

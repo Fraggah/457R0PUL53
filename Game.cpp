@@ -87,7 +87,7 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::D) { m_player->right = true; }
 				else if (event.key.code == sf::Keyboard::W) { m_player->up    = true; }
 				else if (event.key.code == sf::Keyboard::S) { m_player->down  = true; }
-				else if (event.key.code == sf::Keyboard::K && !m_paused) { shootBSimple(); }
+				else if (event.key.code == sf::Keyboard::K && !m_paused) { shoot(); }
 				else if (event.key.code == sf::Keyboard::L && !m_paused) { shootBLaser(); }
 				else if (event.key.code == sf::Keyboard::T && !m_paused) { shootBTriple(); }
 				else if (event.key.code == sf::Keyboard::Num1 && !m_paused) { spawnAssault(); }
@@ -164,6 +164,8 @@ void Game::sCollisions()
 		{
 			//enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
 			m_player->setX(500); m_player->setY(900);
+			m_laserOn = false;
+			m_tripleOn = false;
 			//inb time
 		}
 	}
@@ -184,7 +186,47 @@ void Game::sCollisions()
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
 			m_player->setX(500); m_player->setY(900);
+			m_laserOn = false;
+			m_tripleOn = false;
 			//inb time
+		}
+	}
+
+	for (auto pup : getEntities("powerup"))
+	{
+		sf::Vector2f diff(m_player->boundingBox.getPosition().x - pup->boundingBox.getPosition().x,
+			m_player->boundingBox.getPosition().y - pup->boundingBox.getPosition().y);
+
+		double collisionRadiusSQ = (m_player->boundingBox.getRadius() + pup->boundingBox.getRadius()) *
+			(m_player->boundingBox.getRadius() + pup->boundingBox.getRadius());
+
+		double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+		if (distSQ < collisionRadiusSQ)
+		{
+			pup->is_active = false;
+			if (pup->type == 1)
+			{
+				m_laserOn = true;
+				m_tripleOn = false;
+			}
+			else if (pup->type == 2)
+			{
+				m_laserOn = false;
+				m_tripleOn = true;
+			}
+			else if (pup->type == 3)
+			{
+				m_player->lifes++;
+			}
+			else if (pup->type == 4)
+			{
+				//x blast
+			}
+			else if (pup->type == 5)
+			{
+				energyLevel++;
+			}
 		}
 	}
 
@@ -210,6 +252,13 @@ void Game::sCollisions()
 					if (RNG < 4)
 					{
 						spawnPowerUp(enemy->getX(), enemy->getY());
+					}
+					enemiesKilled++;
+					if (enemiesKilled == 15)
+					{	//Energy charge
+						DynamicEntity* power = new PULaser(enemy->getX(), enemy->getY(), 5);
+						m_toAdd.push_back(power);
+						enemiesKilled = 0;
 					}
 				}
 				else
@@ -262,10 +311,33 @@ void Game::run()
 	}
 }
 
-void Game::shootBSimple()
+void Game::shoot()
 {
-	Bullet* bullet = new BSimple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 2);
-	m_toAdd.push_back(bullet);
+	if (!m_laserOn && !m_tripleOn)
+	{
+		Bullet* bullet = new BSimple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 2);
+		m_toAdd.push_back(bullet);
+	}
+
+	if (m_laserOn)
+	{
+		Bullet* bulletL = new BLaser(m_player->boundingBox.getPosition().x - 16, m_player->boundingBox.getPosition().y, 18);
+		Bullet* bulletR = new BLaser(m_player->boundingBox.getPosition().x + 16, m_player->boundingBox.getPosition().y, 18);
+		m_toAdd.push_back(bulletR);
+		m_toAdd.push_back(bulletL);
+	}
+
+	if (m_tripleOn)
+	{
+		float angle = rand() % 5;
+		Bullet* bulletC = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 0, 20);
+		Bullet* bulletL = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, -angle, 20);
+		Bullet* bulletR = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, angle, 20);
+		m_toAdd.push_back(bulletC);
+		m_toAdd.push_back(bulletL);
+		m_toAdd.push_back(bulletR);
+	}
+
 }
 
 void Game::shootBLaser()
@@ -456,21 +528,20 @@ void Game::enemyShoot() //WORKS
 
 void Game::energyShield()
 {
-	DynamicEntity* shield = new PEnergyShield(m_player->speed);
-	m_toAdd.push_back(shield);
+	if (energyLevel != 0)
+	{
+		DynamicEntity* shield = new PEnergyShield(m_player->speed);
+		m_toAdd.push_back(shield);
+		energyLevel--;
+	}
 }
 
 void Game::spawnPowerUp(float _x, float _y)
 {
-	int RNG = rand() % 100 + 1;
+	int RNG = rand() % 50 + 1;
 	//Enery Shield ---->>>> Cambiar por un contador de enemigos muertos y que caiga cada 15 o 20
-	if (RNG > 30)
-	{
-		DynamicEntity* power = new PULaser(_x, _y,5);
-		m_toAdd.push_back(power);
-	}
-	//Laser
-	else if (RNG > 20 && RNG < 30)
+
+	 if (RNG > 20)
 	{
 		DynamicEntity* power = new PULaser(_x, _y, 1);
 		m_toAdd.push_back(power);
