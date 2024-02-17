@@ -27,7 +27,7 @@
 class Game
 {
 	sf::RenderWindow m_window;
-	Player* m_player = new Player(500, 900, 6);
+	Player* m_player = new Player(500, 800, 6);
 	bool m_running = true;
 	std::map < std::string, std::vector<DynamicEntity*>> m_entityMap;
 	std::vector<DynamicEntity*> m_aliveEntities;
@@ -42,6 +42,10 @@ class Game
 	int energyLevel = 0;
 	bool m_laserOn = false;
 	bool m_tripleOn = false;
+	bool m_sceneChange = false;
+	bool m_menu = true;
+	bool m_inDead = false;
+	sf::Clock deathTime;
 
 	int cannonIterator = 0;         //enemy manager
 	bool cannonLR = true;           //enemy manager
@@ -50,6 +54,10 @@ class Game
 	sf::Font font;
 	sf::Text frametest;
 	std::string tframe = "F: ";
+	sf::Text menutext;
+	std::string press = "Press Start";
+	sf::Text leveltext;
+	std::string leveln = "Level 1";
 	sf::Sprite background;
 	sf::Sprite backgroundmirror;
 	sf::Texture btexture;
@@ -63,6 +71,7 @@ class Game
 	void sCollisions();
 	void sMovement();
 
+	void playerRespawn();
 	void spawnPowerUp(float _x, float _y);
 	void energyShield();
 	void shoot();
@@ -78,6 +87,9 @@ class Game
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);
 
+	void entityKiller();
+	void sceneChange();
+	void sceneChanger();
 	void interface();
 	void level1();
 

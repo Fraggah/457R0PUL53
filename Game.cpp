@@ -21,6 +21,19 @@ void Game::init()
 	frametest.setCharacterSize(24);
 	frametest.setPosition(30, HEIGHT - 40);
 
+	menutext.setFont(font);
+	menutext.setFillColor(sf::Color::White);
+	menutext.setString(press);
+	menutext.setCharacterSize(24);
+	menutext.setPosition(415, 450);
+
+	leveltext.setFont(font);
+	leveltext.setFillColor(sf::Color::White);
+	leveltext.setString(leveln);
+	leveltext.setCharacterSize(24);
+	leveltext.setPosition(440, 450);
+
+
 	if (!btexture.loadFromFile("assets/16/bg1.png"))
 		printf("cannot load bgtexture");
 	if (!btexture2.loadFromFile("assets/16/bg2.png"))
@@ -42,25 +55,36 @@ void Game::init()
 void Game::sRender() 
 {
 	m_window.clear();
-	m_window.draw(background);
-	m_window.draw(backgroundmirror);
-	m_window.draw(background2);
-	m_window.draw(backgroundmirror2);
-	if (m_texturize)
+	if (m_menu)
 	{
-		for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-			m_window.draw(m_aliveEntities[i]->sprite);
-		}
-		m_window.draw(m_player->sprite);
+		m_window.draw(menutext);
 	}
-	if (m_debug)
+	if (m_sceneChange)
 	{
-		for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-			m_window.draw(m_aliveEntities[i]->boundingBox);
-		}
-		m_window.draw(m_player->boundingBox);
+		m_window.draw(leveltext);
 	}
-	m_window.draw(frametest);
+	if (!m_menu && !m_sceneChange)
+	{
+		m_window.draw(background);
+		m_window.draw(backgroundmirror);
+		m_window.draw(background2);
+		m_window.draw(backgroundmirror2);
+		if (m_texturize)
+		{
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->sprite);
+			}
+			m_window.draw(m_player->sprite);
+		}
+		if (m_debug)
+		{
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->boundingBox);
+			}
+			m_window.draw(m_player->boundingBox);
+		}
+		m_window.draw(frametest);
+	}
 	m_window.display();
 }
 
@@ -96,6 +120,10 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::Num4 && !m_paused) { spawnBomber(2); }
 				else if (event.key.code == sf::Keyboard::Num6 && !m_paused) { spawnPowerUp(300,300); }
 				else if (event.key.code == sf::Keyboard::J && !m_paused) { energyShield(); }
+				else if (event.key.code == sf::Keyboard::Enter && m_menu)
+				{
+					m_menu = false;
+				}
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					m_texturize ? m_texturize = false : m_texturize = true;
@@ -162,11 +190,13 @@ void Game::sCollisions()
 
 		if (distSQ < collisionRadiusSQ)
 		{
-			//enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
-			m_player->setX(500); m_player->setY(900);
+			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
+			m_toAdd.push_back(boom);
+			m_player->setX(1500); m_player->setY(1900);
 			m_laserOn = false;
 			m_tripleOn = false;
-			//inb time
+			m_inDead = true;
+			deathTime.restart();
 		}
 	}
 
@@ -185,10 +215,11 @@ void Game::sCollisions()
 			enemyb->is_active = false; 
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
-			m_player->setX(500); m_player->setY(900);
+			m_player->setX(1500); m_player->setY(1900);
 			m_laserOn = false;
 			m_tripleOn = false;
-			//inb time
+			m_inDead = true;
+			deathTime.restart();
 		}
 	}
 
@@ -295,20 +326,36 @@ void Game::run()
 {
 	while (m_running)
 	{
-		if (!m_paused)
+		if (!m_paused && !m_menu)
 		{
 			sMovement();
 			sCollisions();
 			enemyShoot();
 			boomSpamTime();
+			playerRespawn();
 			m_currentFrame++;
 			level1(); //funcionaaaaaaa :D
 		}
-		interface();
-		sUserInput();
 		sRender();
+		interface();
+		sceneChanger();
+		sUserInput();
 		update();
 	}
+}
+
+void Game::playerRespawn()
+{
+	if (m_inDead)
+	{
+		if (deathTime.getElapsedTime() > sf::seconds(1))
+		{
+			sceneChange();
+			m_player->setX(500);m_player->setY(800);
+			m_inDead = false;
+		}
+	}
+
 }
 
 void Game::shoot()
@@ -539,7 +586,6 @@ void Game::energyShield()
 void Game::spawnPowerUp(float _x, float _y)
 {
 	int RNG = rand() % 50 + 1;
-	//Enery Shield ---->>>> Cambiar por un contador de enemigos muertos y que caiga cada 15 o 20
 
 	 if (RNG > 20)
 	{
@@ -629,9 +675,36 @@ void Game::sMovement()
 	}
 }
 
+void Game::sceneChange()
+{
+	m_sceneChange = true;
+	m_currentFrame = -60;
+	entityKiller();
+}
+
+void Game::sceneChanger()
+{
+	if (m_currentFrame >= 0 && m_sceneChange)
+	{
+		background.setPosition(0, 0);
+		background2.setPosition(0, 0);
+		backgroundmirror.setPosition(0, -HEIGHT);
+		backgroundmirror2.setPosition(0, -HEIGHT);
+		m_sceneChange = false;
+	}
+}
+
 void Game::interface()
 {
 	frametest.setString(tframe + std::to_string(m_currentFrame));
+}
+
+void Game::entityKiller()
+{
+	for (auto entity : m_aliveEntities)
+	{
+		entity->is_active = false;
+	}
 }
 
 void Game::level1()
@@ -701,3 +774,18 @@ void Game::level1()
 	}
 
 }
+
+/*Por hacer:
+- Sistema de Puntuacion
+- Bandera para no sobrecargar el escudo
+- X Blast
+- Interfaz
+- Vidas del jugador, gameover
+- Checkpoints
+- 2 Enemigos nuevos
+- Boss
+- Misiles Boss
+- Completar menu Inicio
+- Agregar capa final de Bg
+- Sonidos y Musica
+*/
