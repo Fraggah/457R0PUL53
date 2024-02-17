@@ -21,6 +21,19 @@ void Game::init()
 	frametest.setCharacterSize(24);
 	frametest.setPosition(30, HEIGHT - 40);
 
+	menutext.setFont(font);
+	menutext.setFillColor(sf::Color::White);
+	menutext.setString(press);
+	menutext.setCharacterSize(24);
+	menutext.setPosition(415, 450);
+
+	leveltext.setFont(font);
+	leveltext.setFillColor(sf::Color::White);
+	leveltext.setString(leveln);
+	leveltext.setCharacterSize(24);
+	leveltext.setPosition(440, 450);
+
+
 	if (!btexture.loadFromFile("assets/16/bg1.png"))
 		printf("cannot load bgtexture");
 	if (!btexture2.loadFromFile("assets/16/bg2.png"))
@@ -42,25 +55,36 @@ void Game::init()
 void Game::sRender() 
 {
 	m_window.clear();
-	m_window.draw(background);
-	m_window.draw(backgroundmirror);
-	m_window.draw(background2);
-	m_window.draw(backgroundmirror2);
-	if (m_texturize)
+	if (m_menu)
 	{
-		m_window.draw(m_player->sprite);
-		for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-			m_window.draw(m_aliveEntities[i]->sprite);
-		}
+		m_window.draw(menutext);
 	}
-	if (m_debug)
+	if (m_sceneChange)
 	{
-		for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-			m_window.draw(m_aliveEntities[i]->boundingBox);
-		}
-		m_window.draw(m_player->boundingBox);
+		m_window.draw(leveltext);
 	}
-	m_window.draw(frametest);
+	if (!m_menu && !m_sceneChange)
+	{
+		m_window.draw(background);
+		m_window.draw(backgroundmirror);
+		m_window.draw(background2);
+		m_window.draw(backgroundmirror2);
+		if (m_texturize)
+		{
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->sprite);
+			}
+			m_window.draw(m_player->sprite);
+		}
+		if (m_debug)
+		{
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->boundingBox);
+			}
+			m_window.draw(m_player->boundingBox);
+		}
+		m_window.draw(frametest);
+	}
 	m_window.display();
 }
 
@@ -87,13 +111,19 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::D) { m_player->right = true; }
 				else if (event.key.code == sf::Keyboard::W) { m_player->up    = true; }
 				else if (event.key.code == sf::Keyboard::S) { m_player->down  = true; }
-				else if (event.key.code == sf::Keyboard::K && !m_paused) { shootBSimple(); }
+				else if (event.key.code == sf::Keyboard::K && !m_paused) { shoot(); }
 				else if (event.key.code == sf::Keyboard::L && !m_paused) { shootBLaser(); }
 				else if (event.key.code == sf::Keyboard::T && !m_paused) { shootBTriple(); }
 				else if (event.key.code == sf::Keyboard::Num1 && !m_paused) { spawnAssault(); }
 				else if (event.key.code == sf::Keyboard::Num2 && !m_paused) { spawnCannon(); }
 				else if (event.key.code == sf::Keyboard::Num3 && !m_paused) { spawnDoubleCannon(true); }
 				else if (event.key.code == sf::Keyboard::Num4 && !m_paused) { spawnBomber(2); }
+				else if (event.key.code == sf::Keyboard::Num6 && !m_paused) { spawnPowerUp(300,300); }
+				else if (event.key.code == sf::Keyboard::J && !m_paused) { energyShield(); }
+				else if (event.key.code == sf::Keyboard::Enter && m_menu)
+				{
+					m_menu = false;
+				}
 				else if (event.key.code == sf::Keyboard::F1)
 				{
 					m_texturize ? m_texturize = false : m_texturize = true;
@@ -160,9 +190,13 @@ void Game::sCollisions()
 
 		if (distSQ < collisionRadiusSQ)
 		{
-			//enemy->is_active = false; //ver si es conveniente o no destruir al enemigo....
-			m_player->setX(500); m_player->setY(900);
-			//inb time
+			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
+			m_toAdd.push_back(boom);
+			m_player->setX(1500); m_player->setY(1900);
+			m_laserOn = false;
+			m_tripleOn = false;
+			m_inDead = true;
+			deathTime.restart();
 		}
 	}
 
@@ -181,8 +215,49 @@ void Game::sCollisions()
 			enemyb->is_active = false; 
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
-			m_player->setX(500); m_player->setY(900);
-			//inb time
+			m_player->setX(1500); m_player->setY(1900);
+			m_laserOn = false;
+			m_tripleOn = false;
+			m_inDead = true;
+			deathTime.restart();
+		}
+	}
+
+	for (auto pup : getEntities("powerup"))
+	{
+		sf::Vector2f diff(m_player->boundingBox.getPosition().x - pup->boundingBox.getPosition().x,
+			m_player->boundingBox.getPosition().y - pup->boundingBox.getPosition().y);
+
+		double collisionRadiusSQ = (m_player->boundingBox.getRadius() + pup->boundingBox.getRadius()) *
+			(m_player->boundingBox.getRadius() + pup->boundingBox.getRadius());
+
+		double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+		if (distSQ < collisionRadiusSQ)
+		{
+			pup->is_active = false;
+			if (pup->type == 1)
+			{
+				m_laserOn = true;
+				m_tripleOn = false;
+			}
+			else if (pup->type == 2)
+			{
+				m_laserOn = false;
+				m_tripleOn = true;
+			}
+			else if (pup->type == 3)
+			{
+				m_player->lifes++;
+			}
+			else if (pup->type == 4)
+			{
+				//x blast
+			}
+			else if (pup->type == 5)
+			{
+				energyLevel++;
+			}
 		}
 	}
 
@@ -204,6 +279,18 @@ void Game::sCollisions()
 					enemy->is_active = false;
 					DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
 					m_toAdd.push_back(boom);
+					int RNG = rand() % 100 + 1;
+					if (RNG < 4)
+					{
+						spawnPowerUp(enemy->getX(), enemy->getY());
+					}
+					enemiesKilled++;
+					if (enemiesKilled == 15)
+					{	//Energy charge
+						DynamicEntity* power = new PULaser(enemy->getX(), enemy->getY(), 5);
+						m_toAdd.push_back(power);
+						enemiesKilled = 0;
+					}
 				}
 				else
 				{
@@ -215,32 +302,89 @@ void Game::sCollisions()
 		}
 	}
 
+	for (auto shield : getEntities("shield"))
+	{
+		for (auto ebullet : getEntities("enemybullet"))
+		{	//A causa de que el el movimiento del shield funciona diferente tuve que sumarle un offset para que coinsida con el centro de la BB
+			sf::Vector2f diff(shield->boundingBox.getPosition().x + (esOffset*2)- ebullet->boundingBox.getPosition().x,
+								shield->boundingBox.getPosition().y + (esOffset*2)- ebullet->boundingBox.getPosition().y);
+
+			double collisionRadiusSQ = (shield->boundingBox.getRadius() + ebullet->boundingBox.getRadius()) *
+										(shield->boundingBox.getRadius() + ebullet->boundingBox.getRadius());
+
+			double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+			if (distSQ < collisionRadiusSQ)
+			{
+				ebullet->is_active = false;
+			}
+		}
+	}
 }
 
 void Game::run() 
 {
 	while (m_running)
 	{
-		if (!m_paused)
+		if (!m_paused && !m_menu)
 		{
 			sMovement();
 			sCollisions();
 			enemyShoot();
 			boomSpamTime();
+			playerRespawn();
 			m_currentFrame++;
 			level1(); //funcionaaaaaaa :D
 		}
-		interface();
-		sUserInput();
 		sRender();
+		interface();
+		sceneChanger();
+		sUserInput();
 		update();
 	}
 }
 
-void Game::shootBSimple()
+void Game::playerRespawn()
 {
-	Bullet* bullet = new BSimple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 2);
-	m_toAdd.push_back(bullet);
+	if (m_inDead)
+	{
+		if (deathTime.getElapsedTime() > sf::seconds(1))
+		{
+			sceneChange();
+			m_player->setX(500);m_player->setY(800);
+			m_inDead = false;
+		}
+	}
+
+}
+
+void Game::shoot()
+{
+	if (!m_laserOn && !m_tripleOn)
+	{
+		Bullet* bullet = new BSimple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 2);
+		m_toAdd.push_back(bullet);
+	}
+
+	if (m_laserOn)
+	{
+		Bullet* bulletL = new BLaser(m_player->boundingBox.getPosition().x - 16, m_player->boundingBox.getPosition().y, 18);
+		Bullet* bulletR = new BLaser(m_player->boundingBox.getPosition().x + 16, m_player->boundingBox.getPosition().y, 18);
+		m_toAdd.push_back(bulletR);
+		m_toAdd.push_back(bulletL);
+	}
+
+	if (m_tripleOn)
+	{
+		float angle = rand() % 5;
+		Bullet* bulletC = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 0, 20);
+		Bullet* bulletL = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, -angle, 20);
+		Bullet* bulletR = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, angle, 20);
+		m_toAdd.push_back(bulletC);
+		m_toAdd.push_back(bulletL);
+		m_toAdd.push_back(bulletR);
+	}
+
 }
 
 void Game::shootBLaser()
@@ -429,11 +573,60 @@ void Game::enemyShoot() //WORKS
 	}
 }
 
+void Game::energyShield()
+{
+	if (energyLevel != 0)
+	{
+		DynamicEntity* shield = new PEnergyShield(m_player->speed);
+		m_toAdd.push_back(shield);
+		energyLevel--;
+	}
+}
+
+void Game::spawnPowerUp(float _x, float _y)
+{
+	int RNG = rand() % 50 + 1;
+
+	 if (RNG > 20)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 1);
+		m_toAdd.push_back(power);
+	}
+	//Triple
+	else if (RNG > 10 && RNG < 20)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 2);
+		m_toAdd.push_back(power);
+	}
+	//X Blast
+	else if (RNG > 4 && RNG < 10)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 4);
+		m_toAdd.push_back(power);
+	}
+	//Life Up
+	else if (RNG > 0 && RNG < 4)
+	{
+		DynamicEntity* power = new PULaser(_x, _y, 3);
+		m_toAdd.push_back(power);
+	}
+}
+
 void Game::sMovement()
 {
 	m_player->movement();
 	for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
 		m_aliveEntities[i]->movement();
+	}
+
+	for (auto shield : getEntities("shield"))
+	{
+		shield->sprite.setPosition(m_player->getX()-esOffset, m_player->getY()-esOffset);
+		shield->boundingBox.setPosition(m_player->getX()-esOffset, m_player->getY()-esOffset);
+		if (shield->clock.getElapsedTime() > sf::seconds(2))
+		{
+			shield->is_active = false;
+		}
 	}
 
 	if (m_currentFrame < 120)
@@ -482,9 +675,36 @@ void Game::sMovement()
 	}
 }
 
+void Game::sceneChange()
+{
+	m_sceneChange = true;
+	m_currentFrame = -60;
+	entityKiller();
+}
+
+void Game::sceneChanger()
+{
+	if (m_currentFrame >= 0 && m_sceneChange)
+	{
+		background.setPosition(0, 0);
+		background2.setPosition(0, 0);
+		backgroundmirror.setPosition(0, -HEIGHT);
+		backgroundmirror2.setPosition(0, -HEIGHT);
+		m_sceneChange = false;
+	}
+}
+
 void Game::interface()
 {
 	frametest.setString(tframe + std::to_string(m_currentFrame));
+}
+
+void Game::entityKiller()
+{
+	for (auto entity : m_aliveEntities)
+	{
+		entity->is_active = false;
+	}
 }
 
 void Game::level1()
@@ -554,3 +774,18 @@ void Game::level1()
 	}
 
 }
+
+/*Por hacer:
+- Sistema de Puntuacion
+- Bandera para no sobrecargar el escudo
+- X Blast
+- Interfaz
+- Vidas del jugador, gameover
+- Checkpoints
+- 2 Enemigos nuevos
+- Boss
+- Misiles Boss
+- Completar menu Inicio
+- Agregar capa final de Bg
+- Sonidos y Musica
+*/
