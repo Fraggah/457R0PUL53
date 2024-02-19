@@ -5,6 +5,7 @@ EDoubleCannon::EDoubleCannon(bool _l) : currentWaypointIndex(0)
     type = 1;
     speed = 5;
     lifes = 1;
+    points = 100;
     left = _l;
     if (left)
     {
