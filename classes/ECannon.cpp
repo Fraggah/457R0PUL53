@@ -17,6 +17,7 @@ ECannon::ECannon(bool _l, int _wp)
     }
     speed = 10;
     lifes = 1;
+    points = 250;
     tag = "enemy";
     setTexture();
     sprite.setScale(4, 4);

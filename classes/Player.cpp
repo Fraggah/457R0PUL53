@@ -5,6 +5,8 @@ Player::Player(float _x, float _y, float _s)
 	x = _x;
 	y = _y;
 	speed = _s;
+	lifes = 3;
+	points = 0;
 	setTexture();
 	sprite.scale(4, 4);
 	boundingBox.setRadius(24);

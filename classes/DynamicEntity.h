@@ -3,15 +3,17 @@
 
 class DynamicEntity : public Entity
 {	
-protected:
+public:
+	DynamicEntity();
 	sf::IntRect textureRect1{0, 0, 16, 16};
 	sf::IntRect textureRect2{16, 0, 16, 16};
 	sf::IntRect textureRect3{32, 0, 16, 16};
-public:
-	DynamicEntity();
 	size_t type = 0;
 	int lifes;
+	int points;
 	sf::CircleShape boundingBox;
+	sf::CircleShape boundingBox2;
+	sf::CircleShape boundingBox3;
 	float speed = 0;
 	float speedx = 0;
 	sf::Sprite sprite;

@@ -21,6 +21,7 @@ EBomber::EBomber(size_t _wp)
     }
     lifes = 2;
     speed = 10;
+    points = 1000;
     tag = "enemy";
     setTexture();
     sprite.scale(4, 4);

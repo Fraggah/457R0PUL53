@@ -25,7 +25,7 @@ void Game::init()
 	menutext.setFillColor(sf::Color::White);
 	menutext.setString(press);
 	menutext.setCharacterSize(24);
-	menutext.setPosition(415, 450);
+	menutext.setPosition(415, 550);
 
 	leveltext.setFont(font);
 	leveltext.setFillColor(sf::Color::White);
@@ -33,11 +33,55 @@ void Game::init()
 	leveltext.setCharacterSize(24);
 	leveltext.setPosition(440, 450);
 
+	copy.setFont(font);
+	copy.setFillColor(sf::Color::White);
+	copy.setString(copystring);
+	copy.setCharacterSize(24);
+	copy.setPosition(300, 800);
 
+	hiscore.setFont(font);
+	hiscore.setFillColor(sf::Color::White);
+	hiscore.setString(histring);
+	hiscore.setCharacterSize(24);
+	hiscore.setPosition(430, 50);
+
+	nlifes.setFont(font);
+	nlifes.setFillColor(sf::Color::White);
+	nlifes.setCharacterSize(26);
+	nlifes.setPosition(780, 43);
+
+	points.setFont(font);
+	points.setFillColor(sf::Color::White);
+	points.setCharacterSize(26);
+	points.setPosition(440, 63);
+
+	energyShieldInterface.setFont(font);
+	energyShieldInterface.setFillColor(sf::Color::White);
+	energyShieldInterface.setCharacterSize(26);
+	energyShieldInterface.setString(esstring);
+	energyShieldInterface.setPosition(200, 43);
+
+	if (!titletexture.loadFromFile("assets/16/title.png"))
+		printf("cannot load titletexture");
 	if (!btexture.loadFromFile("assets/16/bg1.png"))
 		printf("cannot load bgtexture");
 	if (!btexture2.loadFromFile("assets/16/bg2.png"))
 		printf("cannot load bg2texture");
+	if (!lifeTexture.loadFromFile("assets/16/lifeinterface.png"))
+		printf("cannot load bg2texture");
+	if (!estexture.loadFromFile("assets/16/esinterface.png"))
+		printf("cannot load bg2texture");
+
+	titlesprite.setTexture(titletexture);
+	titlesprite.scale(4, 4);
+
+	lifeInterface.setTexture(lifeTexture);
+	lifeInterface.scale(4, 4);
+	lifeInterface.setPosition(750, 50);
+
+	essprite.setTexture(estexture);
+	essprite.scale(6, 6);
+	essprite.setPosition(240, 50);
 
 	background.setTexture(btexture);
 	background.scale(4, 4);
@@ -57,7 +101,18 @@ void Game::sRender()
 	m_window.clear();
 	if (m_menu)
 	{
-		m_window.draw(menutext);
+		m_window.draw(titlesprite);
+		m_window.draw(copy);
+		m_window.draw(hiscore);
+		if (pressonoff.getElapsedTime() > sf::seconds(0.5))
+		{
+			m_window.draw(menutext);
+		}
+		if (pressonoff.getElapsedTime() > sf::seconds(1))
+		{
+			pressonoff.restart();
+		}
+
 	}
 	if (m_sceneChange)
 	{
@@ -81,9 +136,20 @@ void Game::sRender()
 			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
 				m_window.draw(m_aliveEntities[i]->boundingBox);
 			}
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->boundingBox2);
+			}
+			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
+				m_window.draw(m_aliveEntities[i]->boundingBox3);
+			}
 			m_window.draw(m_player->boundingBox);
+			m_window.draw(frametest);
 		}
-		m_window.draw(frametest);
+		m_window.draw(lifeInterface);
+		m_window.draw(nlifes);
+		m_window.draw(points);
+		m_window.draw(energyShieldInterface);
+		m_window.draw(essprite);
 	}
 	m_window.display();
 }
@@ -116,13 +182,14 @@ void Game::sUserInput()
 				else if (event.key.code == sf::Keyboard::T && !m_paused) { shootBTriple(); }
 				else if (event.key.code == sf::Keyboard::Num1 && !m_paused) { spawnAssault(); }
 				else if (event.key.code == sf::Keyboard::Num2 && !m_paused) { spawnCannon(); }
-				else if (event.key.code == sf::Keyboard::Num3 && !m_paused) { spawnDoubleCannon(true); }
+				else if (event.key.code == sf::Keyboard::Num3 && !m_paused) { spawnBoss(); }
 				else if (event.key.code == sf::Keyboard::Num4 && !m_paused) { spawnBomber(2); }
 				else if (event.key.code == sf::Keyboard::Num6 && !m_paused) { spawnPowerUp(300,300); }
-				else if (event.key.code == sf::Keyboard::J && !m_paused) { energyShield(); }
+				else if (event.key.code == sf::Keyboard::J && !m_paused && energyShieldTime.getElapsedTime() > sf::seconds(2)) { energyShield(); }
 				else if (event.key.code == sf::Keyboard::Enter && m_menu)
 				{
 					m_menu = false;
+					sceneChange();
 				}
 				else if (event.key.code == sf::Keyboard::F1)
 				{
@@ -154,7 +221,6 @@ void Game::sUserInput()
 
 void Game::sCollisions()
 {	
-	//Sistema final: agregar una bounding box circular a las entities y utilizar formula de distancia menos radio
 	for (auto enemy : getEntities("enemy"))
 	{
 		if (enemy->getX() > WIDTH + 100 || enemy->getX() < -100 || enemy->getY() > HEIGHT + 100 || enemy->getY() < - 100)
@@ -200,6 +266,28 @@ void Game::sCollisions()
 		}
 	}
 
+	for (auto enemy : getEntities("boss"))
+	{
+		sf::Vector2f diff(m_player->boundingBox.getPosition().x - enemy->boundingBox3.getPosition().x -120,
+			m_player->boundingBox.getPosition().y - enemy->boundingBox3.getPosition().y-120);
+
+		double collisionRadiusSQ = (m_player->boundingBox.getRadius() + enemy->boundingBox3.getRadius()) *
+			(m_player->boundingBox.getRadius() + enemy->boundingBox3.getRadius());
+
+		double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+		if (distSQ < collisionRadiusSQ)
+		{
+			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
+			m_toAdd.push_back(boom);
+			m_player->setX(1500); m_player->setY(1900);
+			m_laserOn = false;
+			m_tripleOn = false;
+			m_inDead = true;
+			deathTime.restart();
+		}
+	}
+
 	for (auto enemyb : getEntities("enemybullet"))
 	{
 		sf::Vector2f diff(m_player->boundingBox.getPosition().x - enemyb->boundingBox.getPosition().x,
@@ -216,6 +304,7 @@ void Game::sCollisions()
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
 			m_player->setX(1500); m_player->setY(1900);
+			m_player->lifes--;
 			m_laserOn = false;
 			m_tripleOn = false;
 			m_inDead = true;
@@ -256,7 +345,10 @@ void Game::sCollisions()
 			}
 			else if (pup->type == 5)
 			{
-				energyLevel++;
+				if (energyLevel != 3)
+				{
+					energyLevel++;
+				}
 			}
 		}
 	}
@@ -279,6 +371,8 @@ void Game::sCollisions()
 					enemy->is_active = false;
 					DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
 					m_toAdd.push_back(boom);
+					m_player->points += enemy->points;
+					npoints = m_player->points;
 					int RNG = rand() % 100 + 1;
 					if (RNG < 4)
 					{
@@ -302,6 +396,55 @@ void Game::sCollisions()
 		}
 	}
 
+	for (auto bullet : getEntities("bullet"))
+	{
+		for (auto enemy : getEntities("boss"))
+		{
+			sf::Vector2f diff(enemy->boundingBox.getPosition().x + 120 - bullet->boundingBox.getPosition().x,
+				enemy->boundingBox.getPosition().y + 120 - bullet->boundingBox.getPosition().y);
+
+			double collisionRadiusSQ = (enemy->boundingBox.getRadius() + bullet->boundingBox.getRadius()) *
+				(enemy->boundingBox.getRadius() + bullet->boundingBox.getRadius());
+
+			double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+			if (distSQ < collisionRadiusSQ)
+			{
+				bullet->is_active = false;
+			}
+
+			sf::Vector2f diff2(enemy->boundingBox2.getPosition().x +32 - bullet->boundingBox.getPosition().x,
+				enemy->boundingBox2.getPosition().y +28- bullet->boundingBox.getPosition().y);
+
+			double collisionRadiusSQ2 = (enemy->boundingBox2.getRadius() + bullet->boundingBox.getRadius()) *
+				(enemy->boundingBox2.getRadius() + bullet->boundingBox.getRadius());
+
+			double distSQ2 = (diff2.x * diff2.x) + (diff2.y * diff2.y);
+
+
+			if (distSQ2 < collisionRadiusSQ2)
+			{
+				if (enemy->lifes == 1) {
+					enemy->is_active = false;
+					DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
+					m_toAdd.push_back(boom);
+					m_player->points += enemy->points;
+					npoints = m_player->points;
+				}
+				else
+				{
+					DynamicEntity* boom = new EntityBoom(enemy->getX()+120, enemy->getY()+120, false);
+					boom->sprite.setColor(sf::Color::Blue);
+					m_toAdd.push_back(boom);
+					enemy->lifes--; //crear alguna animacion para indicar que recibió el impacto
+					printf("Yes");
+				}
+				bullet->is_active = false;
+				printf("CRASH\n");
+			}
+		}
+	}
+
 	for (auto shield : getEntities("shield"))
 	{
 		for (auto ebullet : getEntities("enemybullet"))
@@ -320,6 +463,29 @@ void Game::sCollisions()
 			}
 		}
 	}
+
+	for (auto shield : getEntities("shield"))
+	{
+		for (auto enemy : getEntities("enemy"))
+		{	//A causa de que el el movimiento del shield funciona diferente tuve que sumarle un offset para que coinsida con el centro de la BB
+			sf::Vector2f diff(shield->boundingBox.getPosition().x + (esOffset * 2) - enemy->boundingBox.getPosition().x,
+				shield->boundingBox.getPosition().y + (esOffset * 2) - enemy->boundingBox.getPosition().y);
+
+			double collisionRadiusSQ = (shield->boundingBox.getRadius() + enemy->boundingBox.getRadius()) *
+				(shield->boundingBox.getRadius() + enemy->boundingBox.getRadius());
+
+			double distSQ = (diff.x * diff.x) + (diff.y * diff.y);
+
+			if (distSQ < collisionRadiusSQ)
+			{
+				enemy->is_active = false;
+				DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
+				m_toAdd.push_back(boom);
+				m_player->points += enemy->points;
+				npoints = m_player->points;
+			}
+		}
+	}
 }
 
 void Game::run() 
@@ -334,7 +500,7 @@ void Game::run()
 			boomSpamTime();
 			playerRespawn();
 			m_currentFrame++;
-			level1(); //funcionaaaaaaa :D
+			//level1(); //funcionaaaaaaa :D
 		}
 		sRender();
 		interface();
@@ -344,6 +510,17 @@ void Game::run()
 	}
 }
 
+void Game::boosDamaged()
+{
+
+}
+
+void Game::spawnBoss()
+{
+	BossAries* boss = new BossAries();
+	m_toAdd.push_back(boss);
+}
+
 void Game::playerRespawn()
 {
 	if (m_inDead)
@@ -351,7 +528,7 @@ void Game::playerRespawn()
 		if (deathTime.getElapsedTime() > sf::seconds(1))
 		{
 			sceneChange();
-			m_player->setX(500);m_player->setY(800);
+			m_player->setX(480);m_player->setY(800);
 			m_inDead = false;
 		}
 	}
@@ -571,17 +748,37 @@ void Game::enemyShoot() //WORKS
 			}
 		}
 	}
+	for (auto boss : getEntities("boss"))
+	{
+		if (boss->type == 10)
+		{
+			if (boss->clock.getElapsedTime() > sf::seconds(1))
+			{
+				for (int i = 0; i < 24; ++i) {
+					float angle = i * (360.0f / 24) * (3.14159f / 180.0f);
+					float bulletSpeed = 5;
+					float dx = bulletSpeed * cos(angle);
+					float dy = bulletSpeed * sin(angle);
+					Enemy* bullet = new EBossBullet(boss->getX() +120, boss->getY()+120, dx, dy);
+					m_toAdd.push_back(bullet);
+				}
+				boss->clock.restart();
+			}
+		}
+	}
 }
 
 void Game::energyShield()
 {
 	if (energyLevel != 0)
 	{
+		energyShieldTime.restart();
 		DynamicEntity* shield = new PEnergyShield(m_player->speed);
 		m_toAdd.push_back(shield);
 		energyLevel--;
 	}
 }
+
 
 void Game::spawnPowerUp(float _x, float _y)
 {
@@ -675,6 +872,7 @@ void Game::sMovement()
 	}
 }
 
+
 void Game::sceneChange()
 {
 	m_sceneChange = true;
@@ -697,6 +895,25 @@ void Game::sceneChanger()
 void Game::interface()
 {
 	frametest.setString(tframe + std::to_string(m_currentFrame));
+	nlifes.setString(std::to_string(m_player->lifes));
+	points.setString(std::to_string(npoints));
+	if (energyLevel == 0)
+	{
+		essprite.setTextureRect(estextureRect0);
+	}
+	else if (energyLevel == 1)
+	{
+		essprite.setTextureRect(estextureRect1);
+	}
+	else if (energyLevel == 2)
+	{
+		essprite.setTextureRect(estextureRect2);
+	}
+	else if (energyLevel == 3)
+	{
+		essprite.setTextureRect(estextureRect3);
+	}
+
 }
 
 void Game::entityKiller()

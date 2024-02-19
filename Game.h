@@ -14,6 +14,8 @@
 #include "classes/BEnemy.h"
 #include "classes/EntityBoom.h"
 #include "classes/PULaser.h"
+#include "classes/BossAries.h"
+#include "classes/EBossBullet.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -27,7 +29,7 @@
 class Game
 {
 	sf::RenderWindow m_window;
-	Player* m_player = new Player(500, 800, 6);
+	Player* m_player = new Player(480, 800, 6);
 	bool m_running = true;
 	std::map < std::string, std::vector<DynamicEntity*>> m_entityMap;
 	std::vector<DynamicEntity*> m_aliveEntities;
@@ -45,7 +47,10 @@ class Game
 	bool m_sceneChange = false;
 	bool m_menu = true;
 	bool m_inDead = false;
+	bool m_eson;
 	sf::Clock deathTime;
+	sf::Clock pressonoff;
+	sf::Clock energyShieldTime;
 
 	int cannonIterator = 0;         //enemy manager
 	bool cannonLR = true;           //enemy manager
@@ -58,12 +63,31 @@ class Game
 	std::string press = "Press Start";
 	sf::Text leveltext;
 	std::string leveln = "Level 1";
+	sf::Text copy;
+	std::string copystring = "© 2024 Silvio Stefanucci";
+	sf::Text hiscore;
+	std::string histring = "Hi 100000";
+	sf::Text nlifes;
+	sf::Text energyShieldInterface;
+	std::string esstring = "ES";
+	sf::Text points;
+	int npoints;
 	sf::Sprite background;
 	sf::Sprite backgroundmirror;
 	sf::Texture btexture;
 	sf::Sprite background2;
 	sf::Sprite backgroundmirror2;
 	sf::Texture btexture2;
+	sf::Sprite titlesprite;
+	sf::Texture titletexture;
+	sf::Sprite lifeInterface;
+	sf::Texture lifeTexture;
+	sf::Sprite essprite;
+	sf::Texture estexture;
+	sf::IntRect estextureRect0{0, 0, 0, 0};
+	sf::IntRect estextureRect1{0, 0, 5, 3};
+	sf::IntRect estextureRect2{0, 0, 10, 3};
+	sf::IntRect estextureRect3{0, 0, 15, 3};
 
 	void init();
 	void sRender();
@@ -87,6 +111,8 @@ class Game
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);
 
+	void boosDamaged();
+	void spawnBoss();
 	void entityKiller();
 	void sceneChange();
 	void sceneChanger();
