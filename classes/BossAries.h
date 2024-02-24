@@ -9,8 +9,8 @@ class BossAries : public DynamicEntity
     std::vector<sf::Vector2f> waypoints = {
         {70, 100},
         {700, 100},
-        {700,600},
-        {70,600}
+        {700,500},
+        {70,500}
     };
 	void setTexture();
     float offset = -30;

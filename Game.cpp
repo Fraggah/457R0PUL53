@@ -12,6 +12,8 @@ void Game::init()
 	m_window.create(sf::VideoMode(WIDTH, HEIGHT), "AstroPulse", sf::Style::Close);
 	m_window.setFramerateLimit(60);
 
+	renderTexture.create(WIDTH, HEIGHT);
+
 	if (!font.loadFromFile("assets/16/nes.otf"))
 		printf("cannot load font");
 
@@ -61,6 +63,24 @@ void Game::init()
 	energyShieldInterface.setString(esstring);
 	energyShieldInterface.setPosition(200, 43);
 
+	gameover.setFont(font);
+	gameover.setFillColor(sf::Color::White);
+	gameover.setCharacterSize(24);
+	gameover.setString(gotext);
+	gameover.setPosition(430, 450);
+
+	wintext.setFont(font);
+	wintext.setFillColor(sf::Color::White);
+	wintext.setCharacterSize(24);
+	wintext.setString(winstring);
+	wintext.setPosition(124, 450);
+
+	pauseText.setFont(font);
+	pauseText.setFillColor(sf::Color::White);
+	pauseText.setCharacterSize(24);
+	pauseText.setString(pauseString);
+	pauseText.setPosition(460, 445);
+
 	if (!titletexture.loadFromFile("assets/16/title.png"))
 		printf("cannot load titletexture");
 	if (!btexture.loadFromFile("assets/16/bg1.png"))
@@ -94,19 +114,51 @@ void Game::init()
 	backgroundmirror2.setTexture(btexture2);
 	backgroundmirror2.scale(4, 4);
 	backgroundmirror2.setPosition(0, -HEIGHT);
+
+	pauserect.setSize(sf::Vector2f(WIDTH, HEIGHT));
+	pauserect.setFillColor(sf::Color(0, 0, 0, 180));
+
+	maintheme.openFromFile("assets/music/Intro.ogg");
+	level1music.openFromFile("assets/music/Level1.ogg");
+	bossmusic.openFromFile("assets/music/BossAries.ogg");
+	maintheme.play();
+
+	level1music.setLoop(true);
+	bossmusic.setLoop(true);
+
+	shootbuffer.loadFromFile("assets/sounds/shoot.wav");
+	deathbuffer.loadFromFile("assets/sounds/death.wav");
+	enemyboombuffer.loadFromFile("assets/sounds/enemyboom.wav");
+	bosshitbuffer.loadFromFile("assets/sounds/hitboss.wav");
+	startbuffer.loadFromFile("assets/music/Start.ogg");
+	powerUpbuffer.loadFromFile("assets/sounds/powerUp.ogg");
+	energyChargebuffer.loadFromFile("assets/sounds/energyCharge.ogg");
+	energyShieldbuffer.loadFromFile("assets/sounds/energyShield.ogg");
+	energyBulletbuffer.loadFromFile("assets/sounds/energyBullet.ogg");
+
+	shootsound.setBuffer(shootbuffer);
+	deathsound.setBuffer(deathbuffer);
+	enemyboomsound.setBuffer(enemyboombuffer);
+	bosshitsound.setBuffer(bosshitbuffer);
+	startsound.setBuffer(startbuffer);
+	powerUpsound.setBuffer(powerUpbuffer);
+	energyChargesound.setBuffer(energyChargebuffer);
+	energyShieldsound.setBuffer(energyShieldbuffer);
+	energyBulletsound.setBuffer(energyBulletbuffer);
+
 }
 
 void Game::sRender() 
 {
-	m_window.clear();
+	renderTexture.clear();
 	if (m_menu)
 	{
-		m_window.draw(titlesprite);
-		m_window.draw(copy);
-		m_window.draw(hiscore);
+		renderTexture.draw(titlesprite);
+		renderTexture.draw(copy);
+		renderTexture.draw(hiscore);
 		if (pressonoff.getElapsedTime() > sf::seconds(0.5))
 		{
-			m_window.draw(menutext);
+			renderTexture.draw(menutext);
 		}
 		if (pressonoff.getElapsedTime() > sf::seconds(1))
 		{
@@ -114,43 +166,60 @@ void Game::sRender()
 		}
 
 	}
-	if (m_sceneChange)
+	if (m_gameOver)
 	{
-		m_window.draw(leveltext);
+		renderTexture.draw(gameover);
 	}
-	if (!m_menu && !m_sceneChange)
+	if (m_bossDefeated)
 	{
-		m_window.draw(background);
-		m_window.draw(backgroundmirror);
-		m_window.draw(background2);
-		m_window.draw(backgroundmirror2);
+		renderTexture.draw(wintext);
+	}
+	if (m_sceneChange && (!m_gameOver || !m_bossDefeated))
+	{
+		renderTexture.draw(leveltext);
+	}
+	if (!m_menu && !m_sceneChange && !m_gameOver && !m_bossDefeated)
+	{
+		renderTexture.draw(background);
+		renderTexture.draw(backgroundmirror);
+		renderTexture.draw(background2);
+		renderTexture.draw(backgroundmirror2);
 		if (m_texturize)
 		{
 			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-				m_window.draw(m_aliveEntities[i]->sprite);
+				renderTexture.draw(m_aliveEntities[i]->sprite);
 			}
-			m_window.draw(m_player->sprite);
+			renderTexture.draw(m_player->sprite);
 		}
 		if (m_debug)
 		{
 			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-				m_window.draw(m_aliveEntities[i]->boundingBox);
+				renderTexture.draw(m_aliveEntities[i]->boundingBox);
 			}
 			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-				m_window.draw(m_aliveEntities[i]->boundingBox2);
+				renderTexture.draw(m_aliveEntities[i]->boundingBox2);
 			}
 			for (size_t i = 0; i < m_aliveEntities.size(); ++i) {
-				m_window.draw(m_aliveEntities[i]->boundingBox3);
+				renderTexture.draw(m_aliveEntities[i]->boundingBox3);
 			}
-			m_window.draw(m_player->boundingBox);
-			m_window.draw(frametest);
+			renderTexture.draw(m_player->boundingBox);
+			renderTexture.draw(frametest);
 		}
-		m_window.draw(lifeInterface);
-		m_window.draw(nlifes);
-		m_window.draw(points);
-		m_window.draw(energyShieldInterface);
-		m_window.draw(essprite);
+		renderTexture.draw(lifeInterface);
+		renderTexture.draw(nlifes);
+		renderTexture.draw(points);
+		renderTexture.draw(energyShieldInterface);
+		renderTexture.draw(essprite);
+		if (m_paused)
+		{
+			renderTexture.draw(pauserect);
+			renderTexture.draw(pauseText);
+		}
 	}
+	renderTexture.display();
+	renderSprite.setTexture(renderTexture.getTexture(), true);
+	m_window.clear();
+	m_window.draw(renderSprite);
 	m_window.display();
 }
 
@@ -173,23 +242,55 @@ void Game::sUserInput()
 				{
 					m_running = false;
 				}
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F11) {
+
+                    if (m_window.getSize().x == WIDTH && m_window.getSize().y == HEIGHT) {
+                        sf::VideoMode fullscreenMode = sf::VideoMode::getFullscreenModes()[0];
+                        float scale = static_cast<float>(fullscreenMode.height) / static_cast<float>(HEIGHT); //static_cast "convierte" a float los valores para que scale pueda tomar un valor real
+                        m_window.create(fullscreenMode, "Astropulse", sf::Style::Fullscreen);
+						m_window.setMouseCursorVisible(false);
+						m_window.setFramerateLimit(60);
+                        renderSprite.setScale(scale, scale);
+                        renderSprite.setPosition((fullscreenMode.width - (WIDTH*scale))/2, 0);//al ancho de la pantalla, le resto el ancho de la ventana multiplicada por el factor de escala 
+                    }																		  //y ese valor lo divido en 2 para centrar la pantalla, posiciono la x de renderTexture en ese valor resultante
+                    else {
+                        m_window.create(sf::VideoMode(WIDTH, HEIGHT), "Astropulse");
+						m_window.setMouseCursorVisible(true);
+						m_window.setFramerateLimit(60);
+                        renderSprite.setScale(1.f, 1.f);
+                        renderSprite.setPosition(0, 0);
+                    }
+                
+            }
 				else if (event.key.code == sf::Keyboard::A) { m_player->left  = true; }
 				else if (event.key.code == sf::Keyboard::D) { m_player->right = true; }
 				else if (event.key.code == sf::Keyboard::W) { m_player->up    = true; }
 				else if (event.key.code == sf::Keyboard::S) { m_player->down  = true; }
-				else if (event.key.code == sf::Keyboard::K && !m_paused) { shoot(); }
-				else if (event.key.code == sf::Keyboard::L && !m_paused) { shootBLaser(); }
-				else if (event.key.code == sf::Keyboard::T && !m_paused) { shootBTriple(); }
-				else if (event.key.code == sf::Keyboard::Num1 && !m_paused) { spawnAssault(); }
-				else if (event.key.code == sf::Keyboard::Num2 && !m_paused) { spawnCannon(); }
-				else if (event.key.code == sf::Keyboard::Num3 && !m_paused) { spawnBoss(); }
-				else if (event.key.code == sf::Keyboard::Num4 && !m_paused) { spawnBomber(2); }
-				else if (event.key.code == sf::Keyboard::Num6 && !m_paused) { spawnPowerUp(300,300); }
-				else if (event.key.code == sf::Keyboard::J && !m_paused && energyShieldTime.getElapsedTime() > sf::seconds(2)) { energyShield(); }
-				else if (event.key.code == sf::Keyboard::Enter && m_menu)
+				else if (event.key.code == sf::Keyboard::K && !m_paused && !m_goToNextLevel) { shoot(); }
+				else if (event.key.code == sf::Keyboard::L && !m_paused && energyShieldTime.getElapsedTime() > sf::seconds(2)) { energyShield(); }
+				else if (event.key.code == sf::Keyboard::Enter)
 				{
-					m_menu = false;
-					sceneChange();
+					if (m_gameOver)
+					{
+						m_menu = true;
+						m_gameOver = false;
+					}
+					else if (m_menu)
+					{
+						m_menu = false;
+						sceneChange();
+						maintheme.stop();
+						startsound.play();
+						m_player->setX(480);m_player->setY(800);
+
+					}
+					else if (m_bossDefeated)
+					{
+						m_menu = true;
+						m_bossDefeated = false;
+						maintheme.stop();
+					}
+			
 				}
 				else if (event.key.code == sf::Keyboard::F1)
 				{
@@ -199,19 +300,23 @@ void Game::sUserInput()
 				{
 					m_debug ? m_debug = false : m_debug = true;
 				}
-				else if (event.key.code == sf::Keyboard::P)
+				else if (event.key.code == sf::Keyboard::P && m_currentFrame > 0)
 				{
 					m_paused ? m_paused = false : m_paused = true;
+					if (!m_menu && !m_gameOver && !m_goToNextLevel && !m_sceneChange)
+					{
+						startsound.play();
+					}
 				}
 
 				break;
 			}
 			case sf::Event::KeyReleased:
 			{
-				     if (event.key.code == sf::Keyboard::A) { m_player->left  = false; }
-				else if (event.key.code == sf::Keyboard::D) { m_player->right = false; }
-				else if (event.key.code == sf::Keyboard::W) { m_player->up    = false; }
-				else if (event.key.code == sf::Keyboard::S) { m_player->down  = false; }
+				     if (event.key.code == sf::Keyboard::A ) { m_player->left  = false; }
+				else if (event.key.code == sf::Keyboard::D ) { m_player->right = false; }
+				else if (event.key.code == sf::Keyboard::W ) { m_player->up    = false; }
+				else if (event.key.code == sf::Keyboard::S ) { m_player->down  = false; }
 
 			    break;
 			}
@@ -259,9 +364,14 @@ void Game::sCollisions()
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
 			m_player->setX(1500); m_player->setY(1900);
+			m_player->lifes--;
 			m_laserOn = false;
 			m_tripleOn = false;
 			m_inDead = true;
+			energyLevel = 0;
+			level1music.stop();
+			bossmusic.stop();
+			deathsound.play();
 			deathTime.restart();
 		}
 	}
@@ -281,9 +391,14 @@ void Game::sCollisions()
 			DynamicEntity* boom = new EntityBoom(m_player->getX(), m_player->getY(), true);
 			m_toAdd.push_back(boom);
 			m_player->setX(1500); m_player->setY(1900);
+			m_player->lifes--;
 			m_laserOn = false;
 			m_tripleOn = false;
 			m_inDead = true;
+			energyLevel = 0;
+			level1music.stop();
+			bossmusic.stop();
+			deathsound.play();
 			deathTime.restart();
 		}
 	}
@@ -305,9 +420,13 @@ void Game::sCollisions()
 			m_toAdd.push_back(boom);
 			m_player->setX(1500); m_player->setY(1900);
 			m_player->lifes--;
+			energyLevel = 0;
 			m_laserOn = false;
 			m_tripleOn = false;
-			m_inDead = true;
+			m_inDead = true;   //esto podria servir para el win tambien... revisar o cambiar logica
+			level1music.stop();
+			bossmusic.stop();
+			deathsound.play();
 			deathTime.restart();
 		}
 	}
@@ -329,22 +448,41 @@ void Game::sCollisions()
 			{
 				m_laserOn = true;
 				m_tripleOn = false;
+				powerUpsound.play();
+				m_player->points += 500;
 			}
 			else if (pup->type == 2)
 			{
 				m_laserOn = false;
 				m_tripleOn = true;
+				powerUpsound.play();
+				m_player->points += 1000;
 			}
 			else if (pup->type == 3)
 			{
 				m_player->lifes++;
+				powerUpsound.play();
 			}
 			else if (pup->type == 4)
 			{
-				//x blast
+				for (auto enemy : getEntities("enemy"))
+				{
+					enemy->is_active = false;
+					DynamicEntity* boom = new EntityBoom(enemy->getX(), enemy->getY(), false);
+					m_toAdd.push_back(boom);
+					enemyboomsound.play();
+				}
+				for (auto enemyb : getEntities("enemybullet"))
+				{
+					enemyb->is_active = false;
+				}
+				powerUpsound.play();
+				m_player->points += 2500;
 			}
 			else if (pup->type == 5)
 			{
+				energyChargesound.play();
+				m_player->points + 250;
 				if (energyLevel != 3)
 				{
 					energyLevel++;
@@ -373,13 +511,14 @@ void Game::sCollisions()
 					m_toAdd.push_back(boom);
 					m_player->points += enemy->points;
 					npoints = m_player->points;
+					enemyboomsound.play();
 					int RNG = rand() % 100 + 1;
-					if (RNG < 4)
+					if (RNG < 4 && enemiesKilled != 30 && enemiesKilled != 15)
 					{
 						spawnPowerUp(enemy->getX(), enemy->getY());
 					}
 					enemiesKilled++;
-					if (enemiesKilled == 15)
+					if (enemiesKilled == 30)
 					{	//Energy charge
 						DynamicEntity* power = new PULaser(enemy->getX(), enemy->getY(), 5);
 						m_toAdd.push_back(power);
@@ -430,6 +569,18 @@ void Game::sCollisions()
 					m_toAdd.push_back(boom);
 					m_player->points += enemy->points;
 					npoints = m_player->points;
+					enemyboomsound.play();
+					m_goToNextLevel = true;
+					winTime.restart();
+					bossmusic.stop();
+					maintheme.play();
+					//logica de pasar el nivel deberia estar en otro lado para poder escalar el proyecto
+					m_player->setX(1500); m_player->setY(1900);
+					energyLevel = 0;
+					m_laserOn = false;
+					m_tripleOn = false;
+					m_checkpoint1 = false;
+					m_checkpoint2 = false;
 				}
 				else
 				{
@@ -437,6 +588,7 @@ void Game::sCollisions()
 					boom->sprite.setColor(sf::Color::Blue);
 					m_toAdd.push_back(boom);
 					enemy->lifes--; //crear alguna animacion para indicar que recibió el impacto
+					bosshitsound.play();
 					printf("Yes");
 				}
 				bullet->is_active = false;
@@ -460,6 +612,8 @@ void Game::sCollisions()
 			if (distSQ < collisionRadiusSQ)
 			{
 				ebullet->is_active = false;
+				energyBulletsound.play();
+				m_player->points += 50;
 			}
 		}
 	}
@@ -492,7 +646,7 @@ void Game::run()
 {
 	while (m_running)
 	{
-		if (!m_paused && !m_menu)
+		if (!m_paused && !m_menu && !m_goToNextLevel && !m_gameOver)
 		{
 			sMovement();
 			sCollisions();
@@ -500,9 +654,10 @@ void Game::run()
 			boomSpamTime();
 			playerRespawn();
 			m_currentFrame++;
-			//level1(); //funcionaaaaaaa :D
+			level1(); //funcionaaaaaaa :D
 		}
 		sRender();
+		winGame();
 		interface();
 		sceneChanger();
 		sUserInput();
@@ -521,37 +676,25 @@ void Game::spawnBoss()
 	m_toAdd.push_back(boss);
 }
 
-void Game::playerRespawn()
-{
-	if (m_inDead)
-	{
-		if (deathTime.getElapsedTime() > sf::seconds(1))
-		{
-			sceneChange();
-			m_player->setX(480);m_player->setY(800);
-			m_inDead = false;
-		}
-	}
-
-}
-
 void Game::shoot()
 {
-	if (!m_laserOn && !m_tripleOn)
+	if (!m_laserOn && !m_tripleOn && !m_menu && !m_sceneChange && !m_gameOver && !m_goToNextLevel)
 	{
 		Bullet* bullet = new BSimple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 2);
 		m_toAdd.push_back(bullet);
+		shootsound.play();
 	}
 
-	if (m_laserOn)
+	if (m_laserOn && !m_menu && !m_sceneChange && !m_gameOver && !m_goToNextLevel)
 	{
 		Bullet* bulletL = new BLaser(m_player->boundingBox.getPosition().x - 16, m_player->boundingBox.getPosition().y, 18);
 		Bullet* bulletR = new BLaser(m_player->boundingBox.getPosition().x + 16, m_player->boundingBox.getPosition().y, 18);
 		m_toAdd.push_back(bulletR);
 		m_toAdd.push_back(bulletL);
+		shootsound.play();
 	}
 
-	if (m_tripleOn)
+	if (m_tripleOn && !m_menu && !m_sceneChange && !m_gameOver && !m_goToNextLevel)
 	{
 		float angle = rand() % 5;
 		Bullet* bulletC = new BTriple(m_player->boundingBox.getPosition().x, m_player->boundingBox.getPosition().y - 32, 0, 20);
@@ -560,6 +703,7 @@ void Game::shoot()
 		m_toAdd.push_back(bulletC);
 		m_toAdd.push_back(bulletL);
 		m_toAdd.push_back(bulletR);
+		shootsound.play();
 	}
 
 }
@@ -624,6 +768,20 @@ void Game::spawnBomber(int pos)
 	pos--;
 	Enemy* enemy = new EBomber(pos);
 	m_toAdd.push_back(enemy);
+}
+
+void Game::spawnEye(int _x)
+{
+	Enemy* enemy = new Eeye(_x);
+	m_toAdd.push_back(enemy);
+}
+
+void Game::spawnEyePath(int L, int R)
+{
+	for (int i = 0; i <= 16; i++) {
+		if (i > L && i < R) {}
+		else { spawnEye(i * 64); }
+	}
 }
 
 void Game::removeDeadEntities(std::vector<DynamicEntity*>& vec)
@@ -772,6 +930,7 @@ void Game::energyShield()
 {
 	if (energyLevel != 0)
 	{
+		energyShieldsound.play();
 		energyShieldTime.restart();
 		DynamicEntity* shield = new PEnergyShield(m_player->speed);
 		m_toAdd.push_back(shield);
@@ -880,6 +1039,35 @@ void Game::sceneChange()
 	entityKiller();
 }
 
+void Game::gameOver()
+{
+	m_gameOver = true;
+	entityKiller();
+	m_player->lifes = 3;
+	m_player->points = 0;
+	m_checkpoint1 = false;
+	m_checkpoint2 = false;
+	energyLevel = 0;
+}
+
+void Game::winGame()
+{
+	if (winTime.getElapsedTime() > sf::seconds(2) && m_goToNextLevel)
+	{
+		m_bossDefeated = true;
+		winTime.restart();
+		m_goToNextLevel = false;
+		entityKiller();
+		m_player->lifes = 3;
+		m_player->points = 0;
+		m_checkpoint1 = false;
+		m_checkpoint2 = false;
+		energyLevel = 0;
+		m_laserOn = false;
+		m_tripleOn = false;
+	}
+}
+
 void Game::sceneChanger()
 {
 	if (m_currentFrame >= 0 && m_sceneChange)
@@ -892,8 +1080,36 @@ void Game::sceneChanger()
 	}
 }
 
+void Game::playerRespawn()
+{
+	if (m_inDead)
+	{
+		if (deathTime.getElapsedTime() > sf::seconds(1) && m_player->lifes != 0)
+		{
+			sceneChange();
+			m_player->setX(480);m_player->setY(800);
+			m_laserOn = false;
+			m_tripleOn = false;
+			m_inDead = false;
+
+		}
+		else if (deathTime.getElapsedTime() > sf::seconds(1) && m_player->lifes == 0)
+		{
+			gameOver();
+			m_player->setX(480);m_player->setY(800);
+			m_laserOn = false;
+			m_tripleOn = false;
+			m_inDead = false;
+		}
+	}
+}
+
 void Game::interface()
 {
+	if (m_menu)
+	{
+		npoints = 0; //acomodar esto luego y setear guardado de hiscore
+	}
 	frametest.setString(tframe + std::to_string(m_currentFrame));
 	nlifes.setString(std::to_string(m_player->lifes));
 	points.setString(std::to_string(npoints));
@@ -926,8 +1142,11 @@ void Game::entityKiller()
 
 void Game::level1()
 {
-	switch (m_currentFrame) {
-	case 160:spawnDoubleCannon(true);break;
+	switch (m_currentFrame) {  //aqui poner logica de checkpoint???
+	case 10:  level1music.play();break;
+	case 150: if (m_checkpoint1 == true) { m_currentFrame += 2850; }
+			  if (m_checkpoint2 == true) { m_currentFrame += 3930; }break;
+	case 160:spawnDoubleCannon(true); m_checkpoint1 = false; m_checkpoint2 = false;break;
 	case 180:spawnDoubleCannon(true);break;
 	case 200:spawnDoubleCannon(true);break;
 	case 220:spawnDoubleCannon(true);break;
@@ -966,7 +1185,8 @@ void Game::level1()
 	case 2400:spawnCannon();break;
 	case 2550:spawnBomber(2);break;
 	case 2700:spawnBomber(1);spawnBomber(3);break;
-	case 3000:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
+		//checkpoint 1
+	case 3000:spawnDoubleCannon(true);spawnDoubleCannon(false); m_checkpoint1 = true; m_checkpoint2 = false; break;
 	case 3020:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
 	case 3040:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
 	case 3060:spawnDoubleCannon(true);spawnDoubleCannon(false);break;
@@ -982,27 +1202,123 @@ void Game::level1()
 	case 3430:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
 	case 3460:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
 	case 3490:spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();spawnAssault();break;
-	case 3550:spawnBomber(2);
-	case 3600:spawnCannon();break;
-	case 3650:spawnCannon();break;
-	case 3700:spawnCannon();break;
-	case 3750:spawnCannon();break;
-	case 3800:spawnCannon();break;
+	case 3650:spawnBomber(2);spawnBomber(1);spawnBomber(3);break;
+	case 3900:spawnCannon();break;
+	case 3940:spawnCannon();break;
+	case 3980:spawnCannon();break;
+	case 4020:spawnCannon();break;
+	case 4039:spawnCannon();break;
+		//checkpoint 2
+	case 4080:spawnEyePath(0, 16);break;
+	case 4100:spawnEyePath(0, 15);break;	
+	case 4120:spawnEyePath(0, 14);break;
+	case 4140:spawnEyePath(0, 13);break;
+	case 4160:spawnEyePath(1, 12);break;
+	case 4180:spawnEyePath(1, 11);break;
+	case 4200:spawnEyePath(2, 11);break;
+	case 4220:spawnEyePath(2, 10);break;
+	case 4240:spawnEyePath(3, 10);break;
+	case 4260:spawnEyePath(3, 9);break;
+	case 4280:spawnEyePath(3, 8);break;
+	case 4300:spawnEyePath(3, 7);m_checkpoint1 = false; m_checkpoint2 = true; break;
+	case 4320:spawnEyePath(3, 7);break;
+	case 4340:spawnEyePath(4, 8);break;
+	case 4360:spawnEyePath(4, 8);break;
+	case 4380:spawnEyePath(5, 9);break;
+	case 4400:spawnEyePath(5, 9);break;
+	case 4420:spawnEyePath(6, 10);break;
+	case 4440:spawnEyePath(6, 10);break;
+	case 4460:spawnEyePath(7, 11);break;
+	case 4480:spawnEyePath(7, 11);break;
+	case 4500:spawnEyePath(8, 12);break;
+	case 4520:spawnEyePath(8, 12);break;
+	case 4540:spawnEyePath(9, 13);break;
+	case 4560:spawnEyePath(9, 13);break;
+	case 4580:spawnEyePath(10, 14);break;
+	case 4600:spawnEyePath(10, 14);break;
+	case 4620:spawnEyePath(10, 14);break;
+	case 4640:spawnEyePath(10, 14);break;
+	case 4660:spawnEyePath(9, 13);break;
+	case 4680:spawnEyePath(9, 13);break;
+	case 4700:spawnEyePath(8, 12);break;
+	case 4720:spawnEyePath(8, 12);break;
+	case 4740:spawnEyePath(7, 11);break;
+	case 4760:spawnEyePath(7, 11);break;
+	case 4780:spawnEyePath(6, 10);break;
+	case 4800:spawnEyePath(6, 10);break;
+	case 4820:spawnEyePath(7, 11);break;
+	case 4840:spawnEyePath(7, 11);break;
+	case 4860:spawnEyePath(8, 12);break;
+	case 4880:spawnEyePath(8, 12);break;
+	case 4900:spawnEyePath(9, 11);break;
+	case 4920:spawnEyePath(3, 12);break;
+	case 4940:spawnEyePath(2, 12);break;
+	case 4960:spawnEyePath(1, 11);break;
+	case 4980:spawnEyePath(1, 10);break;
+	case 5000:spawnEyePath(1, 5);break;
+	case 5020:spawnEyePath(1, 5);break;
+	case 5040:spawnEyePath(1, 5);break;
+	case 5060:spawnEyePath(2, 6);break;
+	case 5080:spawnEyePath(2, 6);break;
+	case 5100:spawnEyePath(2, 6);break;
+	case 5120:spawnEyePath(3, 7);break;
+	case 5140:spawnEyePath(3, 7);break;
+	case 5160:spawnEyePath(4, 8);break;
+	case 5180:spawnEyePath(4, 8);break;
+	case 5200:spawnEyePath(5, 9);break;
+	case 5220:spawnEyePath(5, 9);break;
+	case 5240:spawnEyePath(6, 10);break;
+	case 5260:spawnEyePath(6, 10);break;
+	case 5280:spawnEyePath(7, 11);break;
+	case 5300:spawnEyePath(7, 11);break;
+	case 5320:spawnEyePath(8, 12);break;
+	case 5340:spawnEyePath(8, 12);break;
+	case 5360:spawnEyePath(9, 13);break;
+	case 5380:spawnEyePath(9, 13);break;
+	case 5400:spawnEyePath(10, 14);break;
+	case 5420:spawnEyePath(10, 14);break;
+	case 5440:spawnEyePath(11, 15);break;
+	case 5460:spawnEyePath(11, 15);break;
+	case 5480:spawnEyePath(11, 15);break;
+	case 5500:spawnEyePath(10, 14);break;
+	case 5520:spawnEyePath(10, 14);break;
+	case 5540:spawnEyePath(9, 13);break;
+	case 5560:spawnEyePath(9, 13);break;
+	case 5580:spawnEyePath(8, 12);break;
+	case 5600:spawnEyePath(9, 11);break;
+	case 5620:spawnEyePath(8, 12);break;
+	case 5640:spawnEyePath(7, 12);break;
+	case 5660:spawnEyePath(7, 13);break;
+	case 5680:spawnEyePath(6, 14);break;
+	case 5700:spawnEyePath(6, 13);break;
+	case 5720:spawnEyePath(5, 13);break;
+	case 5740:spawnEyePath(4, 14);break;
+	case 5760:spawnEyePath(3, 14);break;
+	case 5780:spawnEyePath(2, 15);break;
+	case 5800:spawnEyePath(1, 16);break;
+	case 6100:spawnBoss();level1music.stop();bossmusic.play();
+
 	}
 
 }
 
 /*Por hacer:
-- Sistema de Puntuacion
-- Bandera para no sobrecargar el escudo
-- X Blast
-- Interfaz
-- Vidas del jugador, gameover
-- Checkpoints
-- 2 Enemigos nuevos
-- Boss
-- Misiles Boss
-- Completar menu Inicio
+- Sistema de Puntuacion - HECHO
+- Bandera para no sobrecargar el escudo - HECHO
+- X Blast - HECHO
+- Interfaz - HECHO
+- Vidas del jugador, gameover - HECHO
+- Checkpoints - HECHO
+- 2 Enemigos nuevos - HECHO
+- Boss - HECHO
+- Completar menu Inicio - HECHO
+- Pantalla de victoria - HECHO
+- Mejorar pausa - HECHO
 - Agregar capa final de Bg
-- Sonidos y Musica
+- Sonidos y Musica - HECHO
+- Chequear tiempo dedsp del gameover..
+- chequear ganar level -HECHO
+- sonidos power ups - HECHO
+- animacion x blast - HECHO
+- sonido colision shiel bullet - HECHO
 */

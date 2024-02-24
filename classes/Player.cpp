@@ -25,19 +25,19 @@ void Player::setTexture()
 
 void Player::movement()
 {
-	if (up)
+	if (up && y > 4)
 	{
 		y -= speed;
 	}
-	if (down)
+	if (down && y < 894)
 	{
 		y += speed;
 	}
-	if (left)
+	if (left && x > 0)
 	{
 		x -= speed;
 	}
-	if (right)
+	if (right && x < 960)
 	{
 		x += speed;
 	}

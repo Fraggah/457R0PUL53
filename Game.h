@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "classes/Player.h"
 #include "classes/PEnergyShield.h"
 #include "classes/Bullet.h"
@@ -16,6 +17,7 @@
 #include "classes/PULaser.h"
 #include "classes/BossAries.h"
 #include "classes/EBossBullet.h"
+#include "classes//Eeye.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -29,6 +31,9 @@
 class Game
 {
 	sf::RenderWindow m_window;
+	sf::RenderTexture renderTexture;
+	sf::Sprite renderSprite;
+
 	Player* m_player = new Player(480, 800, 6);
 	bool m_running = true;
 	std::map < std::string, std::vector<DynamicEntity*>> m_entityMap;
@@ -46,11 +51,17 @@ class Game
 	bool m_tripleOn = false;
 	bool m_sceneChange = false;
 	bool m_menu = true;
+	bool m_gameOver = false;
 	bool m_inDead = false;
 	bool m_eson;
+	bool m_checkpoint1 = false;
+	bool m_checkpoint2 = false;
+	bool m_bossDefeated = false;
+	bool m_goToNextLevel = false;
 	sf::Clock deathTime;
 	sf::Clock pressonoff;
 	sf::Clock energyShieldTime;
+	sf::Clock winTime;
 
 	int cannonIterator = 0;         //enemy manager
 	bool cannonLR = true;           //enemy manager
@@ -71,6 +82,12 @@ class Game
 	sf::Text energyShieldInterface;
 	std::string esstring = "ES";
 	sf::Text points;
+	sf::Text gameover;
+	std::string gotext = "Game Over";
+	sf::Text wintext;
+	std::string winstring = "Congratulations! Thanks for play this alpha";
+	sf::Text pauseText;
+	std::string pauseString = "PAUSE";
 	int npoints;
 	sf::Sprite background;
 	sf::Sprite backgroundmirror;
@@ -88,6 +105,28 @@ class Game
 	sf::IntRect estextureRect1{0, 0, 5, 3};
 	sf::IntRect estextureRect2{0, 0, 10, 3};
 	sf::IntRect estextureRect3{0, 0, 15, 3};
+	sf::RectangleShape pauserect;
+	sf::Music maintheme;
+	sf::Music level1music;
+	sf::Music bossmusic;
+	sf::SoundBuffer shootbuffer;
+	sf::SoundBuffer deathbuffer;
+	sf::SoundBuffer enemyboombuffer;
+	sf::SoundBuffer bosshitbuffer;
+	sf::SoundBuffer startbuffer;
+	sf::SoundBuffer powerUpbuffer;
+	sf::SoundBuffer energyChargebuffer;
+	sf::SoundBuffer energyShieldbuffer;
+	sf::SoundBuffer energyBulletbuffer;
+	sf::Sound shootsound;
+	sf::Sound deathsound;
+	sf::Sound enemyboomsound;
+	sf::Sound bosshitsound;
+	sf::Sound startsound;
+	sf::Sound powerUpsound;
+	sf::Sound energyChargesound;
+	sf::Sound energyShieldsound;
+	sf::Sound energyBulletsound;
 
 	void init();
 	void sRender();
@@ -105,12 +144,16 @@ class Game
 	void spawnAssault();
 	void spawnCannon();
 	void spawnBomber(int pos);
+	void spawnEye(int _x);
+	void spawnEyePath(int L, int R);
 	void enemyShoot();
 	void boomSpamTime();
 	void removeDeadEntities(std::vector<DynamicEntity*>& vec);
 	void update();
 	const std::vector<DynamicEntity*>& getEntities(const std::string& tag);
 
+	void winGame();
+	void gameOver();
 	void boosDamaged();
 	void spawnBoss();
 	void entityKiller();
