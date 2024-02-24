@@ -1,0 +1,47 @@
+﻿  BossAries.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  BEnemy.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  BLaser.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  BTriple.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  BSimple.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Bullet.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Entity.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  DynamicEntity.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Enemy.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  ECannon.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  EDoubleCannon.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  EAssault.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  EBomber.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  EPowerUp.cpp
+  EntityBoom.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  EBossBullet.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Eeye.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Game.cpp
+D:\Projects\AstroPulse\Astropulse\Game.h(2,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  main.cpp
+D:\Projects\AstroPulse\Astropulse\Game.h(2,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Player.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  Compilando...
+  PowerUp.cpp
+  StaticEntity.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  PEnergyShield.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
+  PULaser.cpp
+D:\Projects\AstroPulse\Astropulse\classes\Entity.h(3,10): fatal  error C1083: No se puede abrir el archivo incluir: 'SFML/Graphics.hpp': No such file or directory
